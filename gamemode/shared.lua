@@ -10,3 +10,7 @@ local function shared(file)
 	server(file)
 	client(file)
 end
+
+DeriveGamemode("sandbox")
+
+client("depth.lua")
