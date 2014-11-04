@@ -1,16 +1,37 @@
 -- Helper functions to load files
-local function server(file)
+loader = {}
+
+function loader.server(file)
 	if SERVER then include(file) end
 end
-local function client(file)
+function loader.client(file)
 	if SERVER then AddCSLuaFile(file) end
 	if CLIENT then include(file) end
 end
-local function shared(file)
-	server(file)
-	client(file)
+function loader.shared(file)
+	loader.server(file)
+	loader.client(file)
+end
+
+function loader.luafiles(folder)
+	return file.Find("budgetday/gamemode/" .. folder .. "/*.lua", "LUA")
 end
 
 DeriveGamemode("sandbox")
 
-client("depth.lua")
+-- Extend GMod libraries with our own functions
+loader.client("libext/surface.lua")
+loader.client("libext/misc.lua")
+
+-- Set sensible defaults (hide hud, set physicsvars, disable flashlight etc)
+loader.shared("gmod_setdefaults.lua")
+
+-- Load extensions to player meta table
+loader.shared("player_skills.lua")
+loader.shared("player_vars.lua")
+
+-- Load skill system
+loader.shared("skills.lua")
+
+-- Load HUD system
+loader.client("aisah.lua")
