@@ -7,7 +7,7 @@
 
 local plymeta = FindMetaTable("Player")
 
-local bdvar_types = {"Double", "Int", "Float", "String", "Vector", "Entity"}
+local bdvar_types = {"Double", "Int", "Float", "String", "Vector", "Entity", "Bool"}
 
 if SERVER then
 	function plymeta:BD_RegisterVar(name, type, default, validator)

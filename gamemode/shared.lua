@@ -30,8 +30,11 @@ loader.shared("gmod_setdefaults.lua")
 loader.shared("player_skills.lua")
 loader.shared("player_vars.lua")
 
+-- Load HUD system
+loader.client("aisah.lua")
+
 -- Load skill system
 loader.shared("skills.lua")
 
--- Load HUD system
-loader.client("aisah.lua")
+-- Handle player spawning related things (giving weapons, positioning etc)
+loader.server("spawn.lua")

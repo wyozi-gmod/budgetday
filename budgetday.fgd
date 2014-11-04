@@ -1,0 +1,11 @@
+@include "base.fgd"
+@include "halflife2.fgd"
+
+@PointClass base(Targetname, Origin) studio("models/props/cs_assault/camera.mdl") = bd_camera : "BudgetDay security camera"
+[
+	cameraname(string)	:	"Camera Name"	:	""	:	"The camera name shown in security camera monitor"
+]
+
+@PointClass base(Targetname, Origin) studio("models/props/cs_office/computer_monitor.mdl") = bd_camera_monitor : "BudgetDay security camera monitor"
+[
+]

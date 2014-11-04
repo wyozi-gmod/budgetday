@@ -12,6 +12,8 @@ if CLIENT then
 	local MOD = {}
 
 	local icon_heart = Material("icon16/heart.png")
+	local icon_shield = Material("icon16/shield.png")
+	local icon_sports = Material("icon16/sports.png")
 
 	function MOD:Has(ply)
 	    return ply:HasSkill("aisah_vitalstats")
@@ -23,7 +25,8 @@ if CLIENT then
 	function MOD:HUDData(data)
 	    data.title = "Vital Statistics"
 	    data.indicators = {
-	        {icon = icon_heart, slider_frac = LocalPlayer():Health() / LocalPlayer():GetMaxHealth()}
+	        {icon = icon_heart, slider_frac = LocalPlayer():Health() / LocalPlayer():GetMaxHealth()},
+	        {icon = icon_shield, slider_frac = LocalPlayer():Armor() / 100},
 	    }
 	end
 

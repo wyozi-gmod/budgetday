@@ -80,12 +80,16 @@ function DrawHUDComponent(data)
 
 				surface.SetDrawColorAlpha(hud_colors.default, 30)
 				surface.DrawOutlinedRect(ind_x, ind_y, slider_w, 17)
+
+				ind_x = ind_x + slider_w + 10
 			end
 		end
 	end
 end
 
 function DrawHUD()
+	if not LocalPlayer():BD_GetBool("wear_aisah") then return end
+
 	local x,y = 20, 100
 
 	for _,mod in pairs(Modules) do
@@ -102,9 +106,9 @@ end
 hook.Add("HUDPaint", "BD_AISAH", DrawHUD)
 
 -- Handle input
-
 hook.Add("PlayerBindPress", "BD_AISAH", function(ply, bind, pressed)
 	if not input.IsShiftDown() then return end
+	if not LocalPlayer():BD_GetBool("wear_aisah") then return end
 
 	if bind:sub(1, 4) == "slot" and pressed then
 		local slot_idx = tonumber(bind:sub(5))
@@ -116,4 +120,30 @@ hook.Add("PlayerBindPress", "BD_AISAH", function(ply, bind, pressed)
 			return true
 		end
 	end
+end)
+
+-- Draw binoculars for every player who's wearing AISAH. Kindof hacky but meh
+hook.Add("PostPlayerDraw", "BD_AISAH_DrawModel", function(ply)
+	--[[local wearing = ply:Alive() and ply:BD_GetBool("wear_aisah")
+	if not wearing and IsValid(ply.BD_AISAH_Model) then
+		ply.BD_AISAH_Model:Remove()
+	elseif wearing and not IsValid(ply.BD_AISAH_Model) then
+		local m = ClientsideModel("models/weapons/w_binoculars.mdl", RENDERGROUP_OPAQUE)
+		ply.BD_AISAH_Model = m
+	end
+
+	if IsValid(ply.BD_AISAH_Model) then
+		local m = ply.BD_AISAH_Model
+
+		local BoneIndx = ply:LookupBone("ValveBiped.Bip01_Head1")
+	    local BonePos , BoneAng = ply:GetBonePosition( BoneIndx )
+
+	    BoneAng:RotateAroundAxis(BoneAng:Right(), 90)
+	    BoneAng:RotateAroundAxis(BoneAng:Up(), -90)
+
+	    BonePos = BonePos + BoneAng:Forward() * 8 + BoneAng:Up() * -3
+
+		m:SetRenderOrigin(BonePos)
+		m:SetRenderAngles(BoneAng)
+	end]]
 end)
