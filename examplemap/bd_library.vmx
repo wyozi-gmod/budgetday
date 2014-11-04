@@ -2,7 +2,7 @@ versioninfo
 {
 	"editorversion" "400"
 	"editorbuild" "6412"
-	"mapversion" "130"
+	"mapversion" "132"
 	"formatversion" "100"
 	"prefab" "0"
 }
@@ -20,7 +20,7 @@ viewsettings
 world
 {
 	"id" "1"
-	"mapversion" "130"
+	"mapversion" "132"
 	"classname" "worldspawn"
 	"detailmaterial" "detail/detailsprites"
 	"detailvbsp" "detail.vbsp"
@@ -13780,6 +13780,7 @@ entity
 	"id" "8691"
 	"classname" "bd_camera"
 	"angles" "0 180 0"
+	"cameraname" "Entrance"
 	"origin" "304 -576 220"
 	editor
 	{
@@ -13787,6 +13788,90 @@ entity
 		"visgroupshown" "1"
 		"visgroupautoshown" "1"
 		"logicalpos" "[0 15000]"
+	}
+}
+entity
+{
+	"id" "8715"
+	"classname" "info_player_counterterrorist"
+	"angles" "0 0 0"
+	"origin" "-210.953 900.012 66"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 15500]"
+	}
+}
+entity
+{
+	"id" "8717"
+	"classname" "info_player_counterterrorist"
+	"angles" "0 0 0"
+	"origin" "-211.694 798.347 66"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 16000]"
+	}
+}
+entity
+{
+	"id" "8719"
+	"classname" "info_player_counterterrorist"
+	"angles" "0 0 0"
+	"origin" "-217.896 702.373 66"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 -16268]"
+	}
+}
+entity
+{
+	"id" "8721"
+	"classname" "info_player_counterterrorist"
+	"angles" "0 0 0"
+	"origin" "-215.427 996.152 66"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 -15768]"
+	}
+}
+entity
+{
+	"id" "8723"
+	"classname" "info_player_counterterrorist"
+	"angles" "0 0 0"
+	"origin" "-224.622 599.819 66"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 -15268]"
+	}
+}
+entity
+{
+	"id" "8725"
+	"classname" "info_player_counterterrorist"
+	"angles" "0 0 0"
+	"origin" "-220.456 494.984 66"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 -14768]"
 	}
 }
 cameras

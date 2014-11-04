@@ -1,10 +1,10 @@
 AddCSLuaFile()
 
 ENT.Type = "anim"
-ENT.Model = Model("models/props/cs_assault/camera.mdl")
+ENT.Model = Model("models/weapons/w_bugbait.mdl")
 
 function ENT:SetupDataTables()
-	self:NetworkVar("String", 0, "CameraName", {KeyName = "cameraname"})
+	self:NetworkVar("Float", 0, "Priority", {KeyName = "priority"})
 end
 
 function ENT:KeyValue( key, value )
@@ -17,9 +17,10 @@ function ENT:Initialize()
 	if SERVER then
 		self:SetModel(self.Model)
 		
-		self:PhysicsInit(SOLID_VPHYSICS)
+		self:SetNoDraw(true)
+		self:DrawShadow(false)
+		self:SetSolid(SOLID_NONE)
 		self:SetMoveType(MOVETYPE_NONE)
-		self:SetSolid(SOLID_VPHYSICS)
 	end
 end
 

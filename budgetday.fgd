@@ -9,3 +9,9 @@
 @PointClass base(Targetname, Origin) studio("models/props/cs_office/computer_monitor.mdl") = bd_camera_monitor : "BudgetDay security camera monitor"
 [
 ]
+
+@PointClass base(Targetname, Origin) = bd_npc_poi : "A point of interest"
+[
+	targetnpcs(string)	:	"Target NPCs"	:	""	:	"What type of npcs should use this POI. Currently not used"
+	priority(float)	:	"Priority"	:	"100.0"	:	"How high should NPCs prioritize this POI. Negative priority is never considered. Priority is relative. There are no absolute 'origins' for priority other than the default value."
+]

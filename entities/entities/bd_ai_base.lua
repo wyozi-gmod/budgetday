@@ -115,7 +115,9 @@ if SERVER then
 		self.BrainData = {}
 		setmetatable(self.BrainData, {__index = self.Brain})
 
-		self.Brain.Initialize(self.BrainData, self)
+		if self.Brain.Initialize then
+			self.Brain.Initialize(self.BrainData, self)
+		end
 	end
 
 	function ENT:RunBehaviorTick()

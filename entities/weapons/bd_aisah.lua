@@ -26,7 +26,7 @@ function SWEP:PrimaryAttack()
 				self:Remove()
 				self.Owner:BD_SetBool("wear_aisah", true)
 
-				self.Owner:SendLua("resource.PlaySound('HL1/fvox/bell.wav')")
+				self.Owner:SendLua("surface.PlaySound('HL1/fvox/bell.wav')")
 			end
 		end)
 	end

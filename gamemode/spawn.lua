@@ -6,6 +6,9 @@ function GM:PlayerSpawn(ply)
 
 	ply:GiveSkill("aisah")
 	ply:GiveSkill("aisah_vitalstats")
+
+	ply:SetWalkSpeed(170)
+	ply:SetRunSpeed(235)
 end
 
 hook.Add("PlayerDeath", "BD_RemovePlyAisah", function(ply)

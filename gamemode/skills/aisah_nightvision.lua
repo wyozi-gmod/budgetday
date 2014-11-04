@@ -28,6 +28,7 @@ if CLIENT then
 
 	local function DrawNightVision(strength)
 	    if strength and strength <= 0 then return end
+	    if BD_RENDERING_RTWORLD then return end
 
 		strength = math.Clamp(strength or 3, 1, 3)
 		for i=1,strength do
@@ -43,7 +44,7 @@ if CLIENT then
 	end
 
 	hook.Add("RenderScreenspaceEffects", "BD_AISAH_NightVision", function()
-	    if not LocalPlayer():HasSkill("aisah_nightvision") then return end
+	    if not LocalPlayer():BD_GetBool("wear_aisah") or not LocalPlayer():HasSkill("aisah_nightvision") then return end
 
 	    local lvl = LocalPlayer():BD_GetInt("nv_level", 0)
 	    DrawNightVision(lvl)

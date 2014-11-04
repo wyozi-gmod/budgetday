@@ -21,7 +21,7 @@ DeriveGamemode("sandbox")
 
 -- Extend GMod libraries with our own functions
 loader.client("libext/surface.lua")
-loader.client("libext/misc.lua")
+loader.shared("libext/misc.lua")
 
 -- Set sensible defaults (hide hud, set physicsvars, disable flashlight etc)
 loader.shared("gmod_setdefaults.lua")
@@ -38,3 +38,9 @@ loader.shared("skills.lua")
 
 -- Handle player spawning related things (giving weapons, positioning etc)
 loader.server("spawn.lua")
+
+-- Handles things like fall damage
+loader.server("player_misc.lua")
+loader.shared("player_misc_shared.lua")
+
+loader.server("debugnpc.lua")

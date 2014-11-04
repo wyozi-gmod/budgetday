@@ -33,6 +33,8 @@ local hud_colors = {
 	default = Color(200, 200, 200, 160),
 	info = Color(200, 200, 200, 120),
 
+	bar = Color(255, 255, 0),
+
 	state_on = Color(0, 170, 0, 120),
 	state_off = Color(170, 0, 0, 120)
 }
@@ -72,6 +74,12 @@ function DrawHUDComponent(data)
 				ind_x = ind_x + 20
 			end
 
+			if ind.title then
+				local tw, th = draw.SimpleText(ind.title, "Trebuchet18", ind_x, ind_y, hud_colors.info)
+
+				ind_x = ind_x + tw + 5
+			end
+
 			if ind.slider_frac then
 				local slider_w = ind.slider_width or 100
 
@@ -82,6 +90,29 @@ function DrawHUDComponent(data)
 				surface.DrawOutlinedRect(ind_x, ind_y, slider_w, 17)
 
 				ind_x = ind_x + slider_w + 10
+			end
+
+			if ind.bars then
+				for i=0,ind.bars.max do
+
+					if ind.bars.count > i then
+						surface.SetDrawColorAlpha(hud_colors.bar, 140)
+						surface.DrawRect(ind_x, ind_y, 4, 17)
+					end
+
+					surface.SetDrawColorAlpha(hud_colors.default, 30)
+					surface.DrawOutlinedRect(ind_x, ind_y, 4, 17)
+
+					ind_x = ind_x + 5
+				end
+
+				ind_x = ind_x + 8
+			end
+
+			if ind.text then
+				local tw, th = draw.SimpleText(ind.text, "Trebuchet18", ind_x, ind_y, ind.textcolor or hud_colors.info)
+
+				ind_x = ind_x + tw + 5
 			end
 		end
 	end
