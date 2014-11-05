@@ -18,6 +18,8 @@ function GM:OnPlayerHitGround(ply, in_water, on_floater, speed)
 		dmg:SetDamageForce(Vector(0,0,1))
 		dmg:SetDamage(damage)
 		ply:TakeDamageInfo(dmg)
+
+		ply:EmitSound("physics/body/body_medium_impact_soft1.wav", _, _, math.Clamp(damage/100, 0, 1))
 	end
 end
 

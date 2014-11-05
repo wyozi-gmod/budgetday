@@ -38,6 +38,32 @@ function ENT:IsPointOnSight(p)
 end
 
 if SERVER then
+	function ENT:AddFlashlight()
+		local shootpos = self:GetAttachment(self:LookupAttachment("anim_attachment_LH"))
+
+		local wep = ents.Create("gmod_lamp")
+		wep:SetModel(Model("models/maxofs2d/lamp_flashlight.mdl"))
+		wep:SetOwner(self)
+
+		wep:SetFlashlightTexture("effects/flashlight001")
+		wep:SetColor(Color(255, 255, 255))
+		wep:SetDistance(512)
+		wep:SetBrightness(1)
+		wep:SetLightFOV(80)
+	    wep:Switch(true)
+
+	    wep:Spawn()
+
+	    wep:SetModelScale(0.5, 0)
+	    
+	    wep:SetSolid(SOLID_NONE)
+	    wep:SetParent(self)
+
+	    wep:Fire("setparentattachment", "anim_attachment_LH")
+
+	    self.Flashlight = wep
+	end
+
 	function ENT:AddFakeWeapon(model)
 		local shootpos = self:GetAttachment(self:LookupAttachment("anim_attachment_RH"))
 
@@ -150,6 +176,12 @@ if SERVER then
 	end
 
 	function ENT:Think()
+		if IsValid(self.Flashlight) then
+			local shootpos = self:GetAttachment(self:LookupAttachment("anim_attachment_LH"))
+			local pos, ang = shootpos.Pos, shootpos.Ang
+			ang:RotateAroundAxis(ang:Right(), 180)
+			self.Flashlight:SetAngles(ang)
+		end
 	end
 
 	function ENT:UpdateTransmitState()
