@@ -3,6 +3,7 @@ function GM:PlayerSpawn(ply)
 
 	ply:StripWeapons()
 	ply:Give("bd_aisah")
+	ply:Give("weapon_bd_usp")
 
 	ply:GiveSkill("aisah")
 	ply:GiveSkill("aisah_vitalstats")

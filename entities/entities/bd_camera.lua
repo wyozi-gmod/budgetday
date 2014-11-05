@@ -36,6 +36,18 @@ function ENT:Think()
 	--debugoverlay.Line(cpos, cpos+cang:Forward()*100, 0.1)
 end
 
+function ENT:BD_IsInteractable(ply)
+	return true
+end
+function ENT:BD_GetInteractHelpText(ply)
+	return "{press} to do something fancy"
+end
+function ENT:BD_GetInteractLength(ply)
+	return 5
+end
+function ENT:BD_OnInteract(ply)
+end
+
 if CLIENT then
 
 	hook.Add("PostRenderVGUI", "WMC_DrawCamRT", function()
@@ -45,8 +57,9 @@ if CLIENT then
 			if dist > 256 then continue end
 
 			local acam = monitor:GetActiveCamera()
-			if IsValid(acam) then
+			if IsValid(acam) and (not acam.next_screen or acam.next_screen <= CurTime()) then
 				acam.rt = acam.rt or GetRenderTarget("BDCamRT" .. acam:EntIndex(), 256, 256)
+				acam.next_screen = CurTime() + 0.3
 
 				render.PushRenderTarget( acam.rt )
 
@@ -61,6 +74,12 @@ if CLIENT then
 						CamData.w = 300
 						CamData.h = 256
 						CamData.fov = 80
+						--[[CamData.ortho = true
+						local w = 130
+						CamData.ortholeft = -w
+						CamData.orthoright = w
+						CamData.orthotop = -w
+						CamData.orthobottom = w]]
 						CamData.drawviewmodel = false
 						CamData.drawhud = false
 

@@ -52,7 +52,7 @@ concommand.Add("spawnnpc", function(ply)
 			end
 			local stat, err = pcall(function()
 				CheckForCameras(ent:GetPos() + Vector(0,0,60), ent:GetAngles():Forward(), function(pos, dir)
-					MsgN("Checking cameras ", pos, " ", dir)
+					--MsgN("Checking cameras ", pos, " ", dir)
 					Check(pos, dir)
 				end)
 			end)

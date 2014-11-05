@@ -29,6 +29,19 @@ function ENT:Think()
 	end
 end
 
+function ENT:BD_IsInteractable(ply)
+	return false, "Already bugged"
+end
+function ENT:BD_GetInteractHelpText(ply)
+	return "{press} to bug the monitor"
+end
+function ENT:BD_GetInteractLength(ply)
+	return 5
+end
+function ENT:BD_OnInteract(ply)
+	self:SetNWBool("BD_Bugged", true)
+end
+
 if CLIENT then
 	surface.CreateFont("BDCamMonospace", {
 		font = "Consolas",
