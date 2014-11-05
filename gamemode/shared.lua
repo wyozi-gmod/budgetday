@@ -43,4 +43,7 @@ loader.server("spawn.lua")
 loader.server("player_misc.lua")
 loader.shared("player_misc_shared.lua")
 
+-- Handle interactions. "Press e to use" etc
+loader.shared("interact.lua")
+
 loader.server("debugnpc.lua")

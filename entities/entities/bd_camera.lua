@@ -25,10 +25,15 @@ end
 
 function ENT:GetCameraPosAng()
 	local pos, ang = self:GetPos(), self:GetAngles()
-	pos = pos + ang:Forward()*10 - ang:Right()*50
+	pos = pos + ang:Forward()*13 - ang:Right()*33 - ang:Up() * 5
 	ang:RotateAroundAxis(ang:Right(), -25)
-	ang:RotateAroundAxis(ang:Up(), 15)
+	ang:RotateAroundAxis(ang:Up(), 27)
 	return pos, ang
+end
+
+function ENT:Think()
+	--local cpos, cang = self:GetCameraPosAng()
+	--debugoverlay.Line(cpos, cpos+cang:Forward()*100, 0.1)
 end
 
 if CLIENT then
