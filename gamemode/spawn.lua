@@ -1,3 +1,7 @@
+function GM:PlayerSelectSpawn(ply)
+	return table.Random(ents.FindByClass("info_player_terrorist"))
+end
+
 function GM:PlayerSpawn(ply)
 	ply:SetModel("models/player/alyx.mdl")
 

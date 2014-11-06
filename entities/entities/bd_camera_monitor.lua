@@ -29,18 +29,13 @@ function ENT:Think()
 	end
 end
 
-function ENT:BD_IsInteractable(ply)
-	return false, "Already bugged"
-end
-function ENT:BD_GetInteractHelpText(ply)
-	return "{press} to bug the monitor"
-end
-function ENT:BD_GetInteractLength(ply)
-	return 5
-end
-function ENT:BD_OnInteract(ply)
-	self:SetNWBool("BD_Bugged", true)
-end
+interactions.Register("cameramonitor_bug", {
+	filter = function(ent, ply) return ent:GetClass() == "bd_camera_monitor" end,
+	help = function(ent, ply) return "Bug" end,
+	finish = function(ent, ply) end,
+	cancel = function(ent, ply) end,
+	length = function() return 5 end
+})
 
 if CLIENT then
 	surface.CreateFont("BDCamMonospace", {

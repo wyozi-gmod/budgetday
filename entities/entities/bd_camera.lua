@@ -36,17 +36,21 @@ function ENT:Think()
 	--debugoverlay.Line(cpos, cpos+cang:Forward()*100, 0.1)
 end
 
-function ENT:BD_IsInteractable(ply)
-	return true
-end
-function ENT:BD_GetInteractHelpText(ply)
-	return "{press} to do something fancy"
-end
-function ENT:BD_GetInteractLength(ply)
-	return 5
-end
-function ENT:BD_OnInteract(ply)
-end
+interactions.Register("camera_bug", {
+	filter = function(ent, ply) return ent:GetClass() == "bd_camera" end,
+	help = function(ent, ply) return "Bug" end,
+	finish = function(ent, ply) end,
+	cancel = function(ent, ply) end,
+	length = function() return 5 end
+})
+
+interactions.Register("camera_mitm", {
+	filter = function(ent, ply) return ent:GetClass() == "bd_camera" end,
+	help = function(ent, ply) return "Man-in-the-middle attack" end,
+	finish = function(ent, ply) end,
+	cancel = function(ent, ply) end,
+	length = function() return 5 end
+})
 
 if CLIENT then
 
