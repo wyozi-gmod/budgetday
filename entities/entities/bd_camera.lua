@@ -47,9 +47,12 @@ interactions.Register("camera_bug", {
 interactions.Register("camera_mitm", {
 	filter = function(ent, ply) return ent:GetClass() == "bd_camera" end,
 	help = function(ent, ply) return "Man-in-the-middle attack" end,
-	finish = function(ent, ply) end,
+	finish = function(ent, ply)
+		ply:GiveSkill("aisah_cameramitm")
+		ply:SetNWEntity("BD_CameraMITM", ent)
+	end,
 	cancel = function(ent, ply) end,
-	length = function() return 5 end
+	length = function() return 1 end
 })
 
 if CLIENT then

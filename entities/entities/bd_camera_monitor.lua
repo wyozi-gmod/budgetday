@@ -29,6 +29,11 @@ function ENT:Think()
 	end
 end
 
+-- We want access to active camera information from all around the map..
+function ENT:UpdateTransmitState()
+	return TRANSMIT_ALWAYS
+end
+
 interactions.Register("cameramonitor_bug", {
 	filter = function(ent, ply) return ent:GetClass() == "bd_camera_monitor" end,
 	help = function(ent, ply) return "Bug" end,

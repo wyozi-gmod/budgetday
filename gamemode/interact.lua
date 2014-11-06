@@ -10,6 +10,14 @@ function Register(name, tbl)
 	Interactions[name] = tbl
 end
 
+--[[interactions.Register("debug", {
+	filter = function(ent, ply) return true end,
+	help = function(ent, ply) return "DebugDebugDebug" end,
+	finish = function(ent, ply) end,
+	cancel = function(ent, ply) end,
+	length = function() return 5 end
+})]]
+
 local entmeta = FindMetaTable("Entity")
 function entmeta:BD_GetValidInteractions(interacting_ply)
 	local ia = {}
@@ -118,7 +126,7 @@ if CLIENT then
 				end
 			end
 		end
-		if bind == "+use" and pressed then
+		if bind == "+use" and pressed and tr.Entity ~= iact_menu_ent then
 			if IsValid(tr.Entity) then
 				local ias = tr.Entity:BD_GetValidInteractions(LocalPlayer())
 
@@ -137,6 +145,7 @@ if CLIENT then
 			end
 		end
 	end)
+
 	hook.Add("HUDPaint", "BD_InteractHelp", function()
 
 		if LocalPlayer():BD_GetInteraction() then
@@ -151,24 +160,39 @@ if CLIENT then
 			if IsValid(tr.Entity) then
 				local ias = tr.Entity:BD_GetValidInteractions(LocalPlayer())
 
-				local y = ScrH()/2
-				local function text(d)
-					draw.SimpleText(d, "Trebuchet18", ScrW()/2, y)
+				local x = ScrW()/2 - 100
+				local y = ScrH()/2 + 25
+				local w, h = 200, 20
+				local function text_rect(text, bgclr, keytext, keybgclr)
+					bgclr = bgclr or Color(255, 0, 0, 50)
+					keybgclr = keybgclr or Color(255, 127, 0, 50)
+
+					surface.SetDrawColor(0, 0, 0, 150)
+					surface.DrawRect(x, y, w, h)
+
+					surface.SetDrawColor(keybgclr)
+					surface.DrawRect(x+2, y+2, 16, h-4)
+					draw.SimpleText(keytext or "", "Trebuchet18", x+10, y+1, _, TEXT_ALIGN_CENTER)
+
+					surface.SetDrawColor(bgclr)
+					surface.DrawRect(x+20, y+2, w-22, h-4)
+					draw.SimpleText(text, "Trebuchet18", x+22, y+1, _, TEXT_ALIGN_LEFT)
+
 					y = y + 20
 				end
 
 				if #ias == 1 then
-					text(string.format("do '%s' on %s by pressing '+use'", Get(ias[1]).help(tr.Entity, LocalPlayer()), tr.Entity:GetClass()))
+					text_rect(Get(ias[1]).help(tr.Entity, LocalPlayer()), _, "e")
 				elseif #ias > 0 then
 					if iact_menu_ent == tr.Entity then
-						text(string.format("interactions for %s:", tr.Entity:GetClass()))
+						text_rect("Interactions", Color(100, 255, 100, 50))
 						for idx,ianame in pairs(ias) do
 							local interaction = Get(ianame)
 
-							text(string.format("%d: %s", idx, interaction.help(tr.Entity, LocalPlayer())))
+							text_rect(interaction.help(tr.Entity, LocalPlayer()), _, tostring(idx))
 						end
 					else
-						text(string.format("open interact menu for %s with '+use' (%d interactions)", tr.Entity:GetClass(), #ias))
+						text_rect("Open interactions menu", Color(100, 255, 100, 50), "e")
 					end
 				end
 			end
