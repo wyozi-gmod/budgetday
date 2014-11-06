@@ -7,75 +7,79 @@ concommand.Add("spawnnpc", function(ply)
 	local npc = ents.Create("bd_ai_base")
 	npc:SetPos(hit)
 	npc:SetBrain {
-		Think = function(data, ent)
-			local function CheckForCameras(pos, dir, callback, monitors)
-				monitors = monitors or {}
+		CheckForCameras = function(self, pos, dir, callback, checked_monitors)
 
-				callback(pos, dir)
+			checked_monitors = checked_monitors or {}
 
-				local check_ents = ents.FindByClass("bd_camera_monitor")
+			callback(pos, dir)
 
-				for _,ce in pairs(check_ents) do
-					if table.HasValue(monitors, ce) then continue end
+			local check_ents = ents.FindByClass("bd_camera_monitor")
 
-					local pos_diff = (ce:GetPos() - pos)
-					local pos_diff_normal = pos_diff:GetNormalized()
-					local dot = dir:Dot(pos_diff_normal)
-					local dist = pos_diff:Length()
+			for _,ce in pairs(check_ents) do
+				if table.HasValue(checked_monitors, ce) then continue end
 
-					if dist < 512 and dot > 0.25 then
-						table.insert(monitors, ce)
-						local acam = ce:GetActiveCamera()
-						if IsValid(acam) then
-							local cpos, cang = acam:GetCameraPosAng()
-							CheckForCameras(cpos, cang:Forward(), callback, monitors)
-						end
-					end
+				local pos_diff = (ce:GetPos() - pos)
+				local pos_diff_normal = pos_diff:GetNormalized()
+				local dot = dir:Dot(pos_diff_normal)
+				local dist = pos_diff:Length()
 
-				end
-			end
-			local function Check(pos, dir)
-				local check_ents = {player.GetByID(1)}
-
-				for _,ce in pairs(check_ents) do
-					local targpos = ce.EyePos and ce:EyePos() or ce:GetPos()
-
-					local pos_diff = (targpos - pos)
-					local pos_diff_normal = pos_diff:GetNormalized()
-					local dot = dir:Dot(pos_diff_normal)
-					local dist = pos_diff:Length()
-
-					if dist < 512 and dot > 0.6 and ce:IsLineOfSightClear(pos) then
-						MsgN(ce, " getting spotted")
+				if dist < 512 and dot > 0.25 then
+					table.insert(checked_monitors, ce)
+					local acam = ce:GetActiveCamera()
+					if IsValid(acam) then
+						local cpos, cang = acam:GetCameraPosAng()
+						self:CheckForCameras(cpos, cang:Forward(), callback, checked_monitors)
 					end
 				end
+
 			end
+		end,
+		SpotEntities = function(self, pos, dir)
+			local check_ents = {player.GetByID(1)}
+
+			for _,ce in pairs(check_ents) do
+				local targpos = ce.EyePos and ce:EyePos() or ce:GetPos()
+
+				local pos_diff = (targpos - pos)
+				local pos_diff_normal = pos_diff:GetNormalized()
+				local dot = dir:Dot(pos_diff_normal)
+				local dist = pos_diff:Length()
+
+				if dist < 512 and dot > 0.6 and ce:IsLineOfSightClear(pos) then
+					MsgN(ce, " getting spotted")
+				end
+			end
+		end,
+		SpotPosition = function(self, ent)
+			self:CheckForCameras(ent:GetPos() + Vector(0,0,60), ent:GetAngles():Forward(), function(pos, dir)
+				self:SpotEntities(pos, dir)
+			end)
+		end,
+		Think = function(self, data, ent)
 			local stat, err = pcall(function()
-				CheckForCameras(ent:GetPos() + Vector(0,0,60), ent:GetAngles():Forward(), function(pos, dir)
-					--MsgN("Checking cameras ", pos, " ", dir)
-					Check(pos, dir)
-				end)
+				self:SpotPosition(ent)
+
+				if not data.NextRoam or data.NextRoam < CurTime() then
+					ent.loco:SetAcceleration(100)
+					ent.loco:SetDesiredSpeed(100)
+					ent.loco:SetDeathDropHeight(40)
+					ent:StartActivity(ACT_WALK)
+					local p = table.Random(ents.FindByClass("bd_npc_poi")):GetPos()
+					ent:MoveToPos(p, {
+						draw = true,
+						terminate_condition = function()
+							self:SpotPosition(ent)
+							return false
+						end}
+					)
+
+					data.NextRoam = CurTime() + math.random(2, 15)
+				end
+
+				ent:PlaySequenceAndWait("LineIdle0" .. math.random(1, 2))
+				--ent:StartActivity(ACT_IDLE)
 			end)
 			if not stat then MsgN(err) end
-
-			if not data.NextRoam or data.NextRoam < CurTime() then
-				ent.loco:SetAcceleration(100)
-				ent.loco:SetDesiredSpeed(100)
-				ent.loco:SetDeathDropHeight(40)
-				ent:StartActivity(ACT_WALK)
-				local p = table.Random(ents.FindByClass("bd_npc_poi")):GetPos()
-				ent:MoveToPos(p, {
-					draw = true,
-					terminate_condition = function()
-						Check()
-						return false
-					end})
-
-				data.NextRoam = CurTime() + math.random(2, 15)
-			end
-			Check()
-
-			ent:StartActivity(ACT_IDLE)
 			return CurTime()
 		end
 	}

@@ -15,3 +15,8 @@
 	targetnpcs(string)	:	"Target NPCs"	:	""	:	"What type of npcs should use this POI. Currently not used"
 	priority(float)	:	"Priority"	:	"100.0"	:	"How high should NPCs prioritize this POI. Negative priority is never considered. Priority is relative. There are no absolute 'origins' for priority other than the default value."
 ]
+
+@PointClass base(Targetname, Origin, Angles) studio("models/player.mdl") = bd_npc_spawn : "A spawnpoint for guards"
+[
+	guardtype(string)	:	"Guard type"	:	"roaming"	:	"Choices: 'roaming', 'passive'"
+]

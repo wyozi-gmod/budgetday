@@ -137,12 +137,10 @@ if SERVER then
 
 	function ENT:SetBrain(brain)
 		self.Brain = brain
-
 		self.BrainData = {}
-		setmetatable(self.BrainData, {__index = self.Brain})
 
 		if self.Brain.Initialize then
-			self.Brain.Initialize(self.BrainData, self)
+			self.Brain.Initialize(self.Brain, self.BrainData, self)
 		end
 	end
 
@@ -155,7 +153,7 @@ if SERVER then
 		else
 			local nextthink = braindata.NextThink
 			if not nextthink or nextthink <= CurTime() then
-				local nt = brain.Think(braindata, self)
+				local nt = brain.Think(brain, braindata, self)
 				braindata.NextThink = nt
 			end
 		end
