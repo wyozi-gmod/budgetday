@@ -22,6 +22,15 @@ function ENT:IsHookedPosValid()
 end
 
 function ENT:PhysicsCollide(data, phys)
+	-- Dont allow hooking to skybox
+	if data.HitEntity == game.GetWorld() then
+		local tr = util.QuickTrace(data.HitPos, data.HitNormal, function() return false end)
+		if tr.HitSky then
+			phys:SetVelocity(Vector(0, 0, 0))
+			return
+		end
+	end
+
 	if not self:IsHookedPosValid() then
 		self:SetHookedPos(data.HitPos)
 		self.HookTime = CurTime()
@@ -40,6 +49,14 @@ function ENT:Think()
 				return
 			end
 			local mul = self:GetOwner():KeyDown(IN_JUMP) and 11 or 8
+
+			-- Compute a value that increases exponentially (or something like that) the further away
+			--  we are from the rope _horizontally_. This makes moving across the map using grappling hook harder
+			local diff_horizontal = Vector(diff.x, diff.y, 0)
+			local mul_weakener = math.Clamp(1 / (diff_horizontal:Length() / 256), 0, 1)
+
+			mul = mul * mul_weakener
+
 			self:GetOwner():SetVelocity(diff:GetNormalized() * mul)
 		else
 			local tr = util.TraceLine{start = self:GetOwner():GetShootPos(), endpos = self:GetPos(), filter=function()return false end}
@@ -62,10 +79,10 @@ if CLIENT then
 
 		render.SetMaterial( rope )
 		if self:IsHookedPosValid() then
-			render.DrawBeam( self:GetOwner():GetShootPos() + Vector(0, 0, -20), self:GetHookedPos(), 5, 1, 1, Color( 255, 255, 255, 255 ) ) 
+			render.DrawBeam( self:GetOwner():GetShootPos() + Vector(0, 0, -5), self:GetHookedPos(), 5, 1, 1, Color( 255, 255, 255, 255 ) ) 
 			render.DrawBeam( self:GetHookedPos(), self:GetPos(), 5, 1, 1, Color( 255, 255, 255, 255 ) ) 
 		else
-			render.DrawBeam( self:GetOwner():GetShootPos() + Vector(0, 0, -20), self:GetPos(), 5, 1, 1, Color( 255, 255, 255, 255 ) ) 
+			render.DrawBeam( self:GetOwner():GetShootPos() + Vector(0, 0, -5), self:GetPos(), 5, 1, 1, Color( 255, 255, 255, 255 ) ) 
 		end
 	end
 end

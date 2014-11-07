@@ -6,21 +6,21 @@ SWEP.HoldType			= "pistol"
 SWEP.PrintName = "Grappling Hook"
 
 SWEP.Base = "weapon_bdbase"
-SWEP.Primary.Recoil	= 1.35
-SWEP.Primary.Damage = 28
-SWEP.Primary.Delay = 0.38
+SWEP.Primary.Recoil	= 0
+SWEP.Primary.Damage = 0
+SWEP.Primary.Delay = 10
 SWEP.Primary.Cone = 0.02
-SWEP.Primary.ClipSize = 20
-SWEP.Primary.Automatic = true
-SWEP.Primary.DefaultClip = 20
-SWEP.Primary.ClipMax = 80
-SWEP.Primary.Ammo = "Pistol"
+SWEP.Primary.ClipSize = 3
+SWEP.Primary.Automatic = false
+SWEP.Primary.DefaultClip = 3
+SWEP.Primary.ClipMax = 3
+SWEP.Primary.Ammo = "Grapp Hook"
 
 SWEP.UseHands			= true
 SWEP.ViewModelFlip		= false
 SWEP.ViewModelFOV		= 54
-SWEP.ViewModel			= "models/weapons/cstrike/c_pist_usp.mdl"
-SWEP.WorldModel			= "models/weapons/w_pist_usp.mdl"
+SWEP.ViewModel			= "models/freeman/harpoongun.mdl"
+SWEP.WorldModel			= "models/freeman/harpoongun.mdl"
 
 SWEP.Primary.Sound = Sound( "weapons/usp/usp1.wav" )
 SWEP.Primary.SoundLevel = 50
@@ -32,6 +32,8 @@ SWEP.PrimaryAnim = ACT_VM_PRIMARYATTACK_SILENCED
 SWEP.ReloadAnim = ACT_VM_RELOAD_SILENCED
 
 function SWEP:PrimaryAttack()
+	if not self:CanPrimaryAttack() then return end
+
 	if SERVER then
 		local ply = self.Owner
 
@@ -44,9 +46,46 @@ function SWEP:PrimaryAttack()
 		physrope:SetOwner(ply)
 		physrope:Spawn()
 
-
 		physrope:GetPhysicsObject():AddVelocity(ply:GetAimVector() * 1500)
 
-		self:SetNextPrimaryFire(CurTime() + 10)
+		self:TakePrimaryAmmo(1)
+		self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
 	end
+end
+
+
+if CLIENT then
+	function SWEP:GetWorldPos()
+		if not IsValid(self.Owner) then return end
+
+		local BoneIndx = self.Owner:LookupBone("ValveBiped.Bip01_R_Hand")
+	    local BonePos , BoneAng = self.Owner:GetBonePosition( BoneIndx )
+
+		local pos = BonePos
+		local ang = BoneAng
+
+		pos = pos + ang:Forward() * 21.5 + ang:Right() * 1.5
+
+		ang:RotateAroundAxis(ang:Forward(), 180)
+
+		return pos, ang
+	end
+
+	function SWEP:DrawWorldModel()
+		--if self.Owner == LocalPlayer() then return end -- We don't want two detonators in viewmodel. TODO breaks thirdperson (matters?)
+
+	    local pos, ang = self:GetWorldPos()
+	    if not pos or not ang then self:DrawModel() return end
+
+		self:SetRenderOrigin(pos)
+		self:SetRenderAngles(ang)
+		self:SetModelScale(1.2, 0)
+		self:SetupBones()
+		self:DrawModel()
+	end
+
+	function SWEP:GetViewModelPosition( pos, ang )
+		pos = pos + ang:Up() * -4 + ang:Forward() * 25 + ang:Right() * 5
+		return pos, ang
+	end 
 end
