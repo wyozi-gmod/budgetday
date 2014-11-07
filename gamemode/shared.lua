@@ -46,4 +46,10 @@ loader.shared("player_misc_shared.lua")
 -- Handle interactions. "Press e to use" etc
 loader.shared("interact.lua")
 
+-- Handle round logic
+loader.server("round.lua")
+
+-- Handle NPC spawns etc
+loader.server("npchandler.lua")
+
 loader.server("debugnpc.lua")
