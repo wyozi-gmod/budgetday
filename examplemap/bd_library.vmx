@@ -2,7 +2,7 @@ versioninfo
 {
 	"editorversion" "400"
 	"editorbuild" "6412"
-	"mapversion" "228"
+	"mapversion" "232"
 	"formatversion" "100"
 	"prefab" "0"
 }
@@ -20,7 +20,7 @@ viewsettings
 world
 {
 	"id" "1"
-	"mapversion" "228"
+	"mapversion" "232"
 	"classname" "worldspawn"
 	"detailmaterial" "detail/detailsprites"
 	"detailvbsp" "detail.vbsp"
@@ -19551,36 +19551,6 @@ entity
 }
 entity
 {
-	"id" "13624"
-	"classname" "bd_npc_spawn"
-	"angles" "0 270 0"
-	"guardtype" "roaming"
-	"origin" "224 560 64"
-	editor
-	{
-		"color" "220 30 220"
-		"visgroupshown" "1"
-		"visgroupautoshown" "1"
-		"logicalpos" "[0 0]"
-	}
-}
-entity
-{
-	"id" "13627"
-	"classname" "bd_npc_spawn"
-	"angles" "0 270 0"
-	"guardtype" "roaming"
-	"origin" "224 704 64"
-	editor
-	{
-		"color" "220 30 220"
-		"visgroupshown" "1"
-		"visgroupautoshown" "1"
-		"logicalpos" "[0 0]"
-	}
-}
-entity
-{
 	"id" "13630"
 	"classname" "bd_npc_spawn"
 	"angles" "0 270 0"
@@ -19596,71 +19566,11 @@ entity
 }
 entity
 {
-	"id" "13633"
-	"classname" "bd_npc_spawn"
-	"angles" "0 270 0"
-	"guardtype" "roaming"
-	"origin" "-216 704 64"
-	editor
-	{
-		"color" "220 30 220"
-		"visgroupshown" "1"
-		"visgroupautoshown" "1"
-		"logicalpos" "[0 0]"
-	}
-}
-entity
-{
-	"id" "13636"
-	"classname" "bd_npc_spawn"
-	"angles" "0 270 0"
-	"guardtype" "roaming"
-	"origin" "-216 560 64"
-	editor
-	{
-		"color" "220 30 220"
-		"visgroupshown" "1"
-		"visgroupautoshown" "1"
-		"logicalpos" "[0 0]"
-	}
-}
-entity
-{
-	"id" "13639"
-	"classname" "bd_npc_spawn"
-	"angles" "0 270 0"
-	"guardtype" "roaming"
-	"origin" "-216 856 64"
-	editor
-	{
-		"color" "220 30 220"
-		"visgroupshown" "1"
-		"visgroupautoshown" "1"
-		"logicalpos" "[0 0]"
-	}
-}
-entity
-{
 	"id" "13642"
 	"classname" "bd_npc_spawn"
 	"angles" "0 270 0"
 	"guardtype" "roaming"
 	"origin" "8 848 64"
-	editor
-	{
-		"color" "220 30 220"
-		"visgroupshown" "1"
-		"visgroupautoshown" "1"
-		"logicalpos" "[0 0]"
-	}
-}
-entity
-{
-	"id" "13645"
-	"classname" "bd_npc_spawn"
-	"angles" "0 270 0"
-	"guardtype" "roaming"
-	"origin" "232 848 64"
 	editor
 	{
 		"color" "220 30 220"
@@ -20200,6 +20110,21 @@ entity
 		"visgroupshown" "1"
 		"visgroupautoshown" "1"
 		"logicalpos" "[0 6500]"
+	}
+}
+entity
+{
+	"id" "15365"
+	"classname" "bd_npc_spawn"
+	"angles" "0 180 0"
+	"guardtype" "passive"
+	"origin" "80 1368 64"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
 	}
 }
 cameras

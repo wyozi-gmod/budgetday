@@ -44,6 +44,22 @@ interactions.Register("vent_breakin", {
 	cancel = function(ent, ply) end,
 	length = function() return 5 end
 })
+interactions.Register("body_drag", {
+	filter = function(ent, ply)
+		return ent:GetClass() == "prop_ragdoll"
+	end,
+	help = function(ent, ply) return "Start dragging" end,
+	finish = function(ent, ply)
+		local tr = ply:GetEyeTrace()
+		if IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_ragdoll" then
+			bd.DragBody(ply, tr.Entity, tr.PhysicsBone)
+		else
+			ply:ChatPrint("point at ragdoll while channeling")
+		end
+	end,
+	cancel = function(ent, ply) end,
+	length = function() return 0.5 end
+})
 
 local entmeta = FindMetaTable("Entity")
 function entmeta:BD_GetValidInteractions(interacting_ply)

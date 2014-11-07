@@ -18,6 +18,13 @@ function GM:PlayerSpawn(ply)
 	ply:SetupHands() -- Create the hands and call GM:PlayerSetHandsModel
 end
 
+function GM:PlayerDeathThink( pl )
+end
+
+function GM:PlayerDeathSound()
+	return true
+end
+
 function GM:PlayerSetHandsModel( ply, ent )
 	local simplemodel = player_manager.TranslateToPlayerModelName( ply:GetModel() )
 	local info = player_manager.TranslatePlayerHands( simplemodel )

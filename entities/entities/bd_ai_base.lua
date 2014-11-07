@@ -8,7 +8,7 @@ end
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel("models/alyx.mdl")
+		self:SetModel("models/odessa.mdl")
 	end
 end
 
@@ -185,41 +185,47 @@ if SERVER then
 	function ENT:UpdateTransmitState()
 		return TRANSMIT_ALWAYS
 	end
-end
 
-if CLIENT then
-	local matBeam = Material( "effects/lamp_beam" )
-	function ENT:DrawSight(points)
-		points = points or 32
+	-- Once again some nice code from TTT..
+	function ENT:BecomePhysicalRagdoll(dmginfo)
 
-		local cone_tip = self:EyePosN()
-		local cone_dir_ang = self:EyeAngles()
-		local cone_dir = cone_dir_ang:Forward()
+		local rag = ents.Create("prop_ragdoll")
+		if not IsValid(rag) then return nil end
 
-		local cone_dir_right = cone_dir_ang:Right()
-		local cone_dir_up = cone_dir_ang:Up()
+		rag:SetPos(self:GetPos())
+		rag:SetModel(self:GetModel())
+		rag:SetAngles(self:GetAngles())
+		rag:Spawn()
+		rag:Activate()
 
-		local cone_height = 650
+		-- nonsolid to players, but can be picked up and shot
+		rag:SetCollisionGroup(COLLISION_GROUP_WEAPON)
 
-		local cone_base_radius = 350
+		-- position the bones
+		local num = rag:GetPhysicsObjectCount()-1
+		local v = self:GetVelocity()
+		-- bullets have a lot of force, which feels better when shooting props,
+		-- but makes bodies fly, so dampen that here
+		if dmginfo:IsDamageType(DMG_BULLET) or dmginfo:IsDamageType(DMG_SLASH) then
+			v = v / 5
+		end
+		for i=0, num do
+			local bone = rag:GetPhysicsObjectNum(i)
+			if IsValid(bone) then
+				local bp, ba = self:GetBonePosition(rag:TranslatePhysBoneToBone(i))
+				if bp and ba then
+					bone:SetPos(bp)
+					bone:SetAngles(ba)
+				end
+				-- not sure if this will work:
+				bone:SetVelocity(v)
+			end
+		end
 
-		--[[local rad_per_point = (math.pi*2) / points
-		for p=0,points do
-			local rad = rad_per_point * p
+	end
 
-			local tr = util.QuickTrace (
-				cone_tip,
-				cone_dir * cone_height + cone_dir_right*math.cos(rad)*cone_base_radius + cone_dir_up*math.sin(rad)*cone_base_radius,
-				self
-			)
-
-			debugoverlay.Line(tr.StartPos, tr.HitPos, 0.1, Color(255, 255, 255))
-		end]]
-
-		render.SetMaterial( matBeam )
-		render.StartBeam( 2 )
-		render.AddBeam( cone_tip, 128, 0.0, Color( 255, 255, 255, 64) )
-		render.AddBeam( cone_tip + cone_dir*cone_height, cone_base_radius, 1, Color( 255, 255, 255, 100) )
-		render.EndBeam()
+	function ENT:OnKilled( dmginfo )
+		self:BecomePhysicalRagdoll( dmginfo )
+		self:Remove()
 	end
 end

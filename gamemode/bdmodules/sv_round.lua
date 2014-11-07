@@ -1,8 +1,8 @@
 
 local default_round_lengths = {
-	["pre"] = 5,
+	["pre"] = 2,
 	["active"] = 60 * 7,
-	["post"] = 3
+	["post"] = 1
 }
 
 local round_actions = {
