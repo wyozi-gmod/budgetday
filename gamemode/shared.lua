@@ -13,8 +13,8 @@ function loader.shared(file)
 	loader.client(file)
 end
 
-function loader.luafiles(folder)
-	return file.Find("budgetday/gamemode/" .. folder .. "/*.lua", "LUA")
+function loader.luafiles(folder, filfilter)
+	return file.Find("budgetday/gamemode/" .. folder .. "/" .. (filfilter or "*") .. ".lua", "LUA")
 end
 
 DeriveGamemode("sandbox")
@@ -23,33 +23,13 @@ DeriveGamemode("sandbox")
 loader.client("libext/surface.lua")
 loader.shared("libext/misc.lua")
 
--- Set sensible defaults (hide hud, set physicsvars, disable flashlight etc)
-loader.shared("gmod_setdefaults.lua")
-
--- Load extensions to player meta table
-loader.shared("player_skills.lua")
-loader.shared("player_vars.lua")
-
--- Load HUD system
-loader.client("aisah.lua")
-
--- Load skill system
-loader.shared("skills.lua")
-
--- Handle player spawning related things (giving weapons, positioning etc)
-loader.server("spawn.lua")
-
--- Handles things like fall damage
-loader.server("player_misc.lua")
-loader.shared("player_misc_shared.lua")
-
--- Handle interactions. "Press e to use" etc
-loader.shared("interact.lua")
-
--- Handle round logic
-loader.server("round.lua")
-
--- Handle NPC spawns etc
-loader.server("npchandler.lua")
-
-loader.server("debugnpc.lua")
+-- Load module files in bdmodules folder
+for _,fil in pairs(loader.luafiles("bdmodules", "sh_*")) do
+	loader.shared("bdmodules/" .. fil)
+end
+for _,fil in pairs(loader.luafiles("bdmodules", "cl_*")) do
+	loader.client("bdmodules/" .. fil)
+end
+for _,fil in pairs(loader.luafiles("bdmodules", "sv_*")) do
+	loader.server("bdmodules/" .. fil)
+end
