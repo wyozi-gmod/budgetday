@@ -46,7 +46,7 @@ interactions.Register("camera_bug", {
 
 interactions.Register("camera_mitm", {
 	filter = function(ent, ply) return ent:GetClass() == "bd_camera" end,
-	help = function(ent, ply) return "Man-in-the-middle attack" end,
+	help = function(ent, ply) return "Hack camera feed" end,
 	finish = function(ent, ply)
 		ply:GiveSkill("aisah_cameramitm")
 		ply:SetNWEntity("BD_CameraMITM", ent)

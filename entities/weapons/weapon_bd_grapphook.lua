@@ -32,13 +32,21 @@ SWEP.PrimaryAnim = ACT_VM_PRIMARYATTACK_SILENCED
 SWEP.ReloadAnim = ACT_VM_RELOAD_SILENCED
 
 function SWEP:PrimaryAttack()
-	if CLIENT then
-		MsgN("?")
+	if SERVER then
 		local ply = self.Owner
 
-		local c_Model = ents.CreateClientProp()
-		c_Model:SetPos( ply:GetPos() + Vector(0, 0, 100))
-		c_Model:SetModel( "models/props_borealis/bluebarrel001.mdl" )
-		c_Model:Spawn()
+		local physrope = ents.Create("bd_physrope")
+		physrope:SetPos(ply:GetShootPos() + ply:GetAimVector()*50)
+
+		local ang = ply:EyeAngles()
+		ang:RotateAroundAxis(ang:Right(), 90)
+		physrope:SetAngles(ang)
+		physrope:SetOwner(ply)
+		physrope:Spawn()
+
+
+		physrope:GetPhysicsObject():AddVelocity(ply:GetAimVector() * 1500)
+
+		self:SetNextPrimaryFire(CurTime() + 10)
 	end
 end

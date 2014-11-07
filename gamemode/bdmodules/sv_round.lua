@@ -2,7 +2,7 @@
 local default_round_lengths = {
 	["pre"] = 5,
 	["active"] = 60 * 7,
-	["post"] = 5
+	["post"] = 3
 }
 
 local round_actions = {
@@ -25,7 +25,6 @@ local function SetRoundState(state)
 	MsgN("Round state changing to ", state)
 
 	SetGlobalFloat("roundstart", CurTime())
-	SetGlobalFloat("roundend", CurTime() + default_round_lengths[state])
 
 	local ract = round_actions[state]
 	if ract then
@@ -36,31 +35,25 @@ local function SetRoundState(state)
 	end
 
 	BroadcastLua("chat.AddText('round state: " .. state .. "')")
+	local old_state = GetGlobalString("roundstate")
+	SetGlobalString("roundstate", state)
 
-	return SetGlobalString("roundstate", state)
+	hook.Call("BDRoundStateChanged", GAMEMODE, old_state, state)
 end
 
-local function GetRoundState()
+function bd.GetRoundState()
 	return GetGlobalString("roundstate")
 end
 
-
 local function RoundTick()
-	local state = GetRoundState()
+	local state = bd.GetRoundState()
 
-	local round_expired = GetGlobalFloat("roundend") < CurTime()
-	if round_expired then
-		if state == "pre" then
-			if #player.GetAll() > 0 then
-				SetRoundState("active")
-			end
-		elseif state == "active" then
-			SetRoundState("post")
-		elseif state == "post" then
-			SetRoundState("pre")
+	local round_elapsed = CurTime() - GetGlobalFloat("roundstart", 0)
+	if state == "pre" then
+		if round_elapsed > default_round_lengths.pre and #player.GetAll() > 0 then
+			SetRoundState("active")
 		end
 	elseif state == "active" then
-		-- TODO ??
 		local alive = false
 		for _,ply in pairs(player.GetAll()) do
 			if ply:Alive() then alive = true end
@@ -69,6 +62,12 @@ local function RoundTick()
 		if not alive then
 			SetRoundState("post")
 		end
+	elseif state == "post" then
+		if round_elapsed > default_round_lengths.pre then
+			SetRoundState("pre")
+		end
+	else
+		SetRoundState("pre")
 	end
 end
 

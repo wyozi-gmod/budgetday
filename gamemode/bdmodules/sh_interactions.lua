@@ -18,6 +18,33 @@ end
 	length = function() return 5 end
 })]]
 
+interactions.Register("door_lockpick", {
+	filter = function(ent, ply)
+		return
+			ent:GetClass() == "prop_door_rotating" and
+			not ent:GetNWBool("lockpicked")
+	end,
+	help = function(ent, ply) return "Lockpick" end,
+	finish = function(ent, ply)
+		ent:Fire("unlock", "", 0)
+		ent:Fire("open", "", 0)
+		ent:Fire("lock", "", 0)
+		ent:SetNWBool("lockpicked", true) end,
+	cancel = function(ent, ply) end,
+	length = function() return 5 end
+})
+interactions.Register("vent_breakin", {
+	filter = function(ent, ply)
+		return ent:GetClass() == "func_breakable"
+	end,
+	help = function(ent, ply) return "Break in" end,
+	finish = function(ent, ply)
+		ent:Fire("Break", "", 0)
+	end,
+	cancel = function(ent, ply) end,
+	length = function() return 5 end
+})
+
 local entmeta = FindMetaTable("Entity")
 function entmeta:BD_GetValidInteractions(interacting_ply)
 	local ia = {}
