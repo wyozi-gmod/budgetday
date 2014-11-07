@@ -1,10 +1,6 @@
 -- Artificially Improved Sight And HUD
 
-module("aisah", package.seeall)
-
--- Load modules
-
-Modules = {}
+bd.AISAHModules = {}
 
 local module_meta = {
 	RegisterInput = function(self, numkey, fn)
@@ -14,15 +10,15 @@ local module_meta = {
 }
 module_meta.__index = module_meta
 
-function RegisterModule(name, mod)
+function bd.RegisterAISAHModule(name, mod)
 	setmetatable(mod, module_meta)
-	Modules[name] = mod
+	bd.AISAHModules[name] = mod
 
 	mod:Setup()
 end
 
-function FindModule(filter)
-	for _,mod in pairs(Modules) do
+function bd.FindAISAHModule(filter)
+	for _,mod in pairs(bd.AISAHModules) do
 		if filter(mod) then return mod end
 	end
 end
@@ -39,7 +35,7 @@ local hud_colors = {
 	state_off = Color(170, 0, 0, 120)
 }
 
-function DrawHUDComponent(data)
+local function DrawHUDComponent(data)
 	local state_clr = hud_colors.default
 	if data.state ~= nil then
 		state_clr = data.state and hud_colors.state_on or hud_colors.state_off
@@ -118,12 +114,12 @@ function DrawHUDComponent(data)
 	end
 end
 
-function DrawHUD()
+local function DrawHUD()
 	if not LocalPlayer():BD_GetBool("wear_aisah") then return end
 
 	local x,y = 20, 100
 
-	for _,mod in pairs(Modules) do
+	for _,mod in pairs(bd.AISAHModules) do
 		if mod:Has(LocalPlayer()) then
 			local data = {x = x, y = y}
 			mod:HUDData(data)
@@ -143,7 +139,7 @@ hook.Add("PlayerBindPress", "BD_AISAH", function(ply, bind, pressed)
 
 	if bind:sub(1, 4) == "slot" and pressed then
 		local slot_idx = tonumber(bind:sub(5))
-		local mod = FindModule(function(mod)
+		local mod = bd.FindAISAHModule(function(mod)
 			return mod.RegisteredInputs and mod.RegisteredInputs[slot_idx] and mod:Has(LocalPlayer())
 		end)
 		if mod then
@@ -151,30 +147,4 @@ hook.Add("PlayerBindPress", "BD_AISAH", function(ply, bind, pressed)
 			return true
 		end
 	end
-end)
-
--- Draw binoculars for every player who's wearing AISAH. Kindof hacky but meh
-hook.Add("PostPlayerDraw", "BD_AISAH_DrawModel", function(ply)
-	--[[local wearing = ply:Alive() and ply:BD_GetBool("wear_aisah")
-	if not wearing and IsValid(ply.BD_AISAH_Model) then
-		ply.BD_AISAH_Model:Remove()
-	elseif wearing and not IsValid(ply.BD_AISAH_Model) then
-		local m = ClientsideModel("models/weapons/w_binoculars.mdl", RENDERGROUP_OPAQUE)
-		ply.BD_AISAH_Model = m
-	end
-
-	if IsValid(ply.BD_AISAH_Model) then
-		local m = ply.BD_AISAH_Model
-
-		local BoneIndx = ply:LookupBone("ValveBiped.Bip01_Head1")
-	    local BonePos , BoneAng = ply:GetBonePosition( BoneIndx )
-
-	    BoneAng:RotateAroundAxis(BoneAng:Right(), 90)
-	    BoneAng:RotateAroundAxis(BoneAng:Up(), -90)
-
-	    BonePos = BonePos + BoneAng:Forward() * 8 + BoneAng:Up() * -3
-
-		m:SetRenderOrigin(BonePos)
-		m:SetRenderAngles(BoneAng)
-	end]]
 end)

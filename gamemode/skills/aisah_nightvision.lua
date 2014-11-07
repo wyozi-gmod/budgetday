@@ -7,7 +7,7 @@ end
 function SKILL:UnRegisterVariables(ply)
 end
 
-skills.RegisterModule("aisah_nightvision", SKILL)
+bd.RegisterSkill("aisah_nightvision", SKILL)
 
 if CLIENT then
 	-- CSS nightvision
@@ -73,5 +73,5 @@ if CLIENT then
 	    }
 	end
 
-	aisah.RegisterModule("nightvision", MOD)
+	bd.RegisterAISAHModule("nightvision", MOD)
 end

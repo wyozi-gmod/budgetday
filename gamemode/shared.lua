@@ -19,6 +19,9 @@ end
 
 DeriveGamemode("sandbox")
 
+-- Global table for all storage needs
+bd = bd or {}
+
 -- Extend GMod libraries with our own functions
 loader.client("libext/surface.lua")
 loader.shared("libext/misc.lua")
@@ -33,3 +36,6 @@ end
 for _,fil in pairs(loader.luafiles("bdmodules", "sv_*")) do
 	loader.server("bdmodules/" .. fil)
 end
+
+-- Load skills from "skills/" folder
+loader.shared("skills.lua")
