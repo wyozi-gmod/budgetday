@@ -34,6 +34,8 @@ SWEP.ReloadAnim = ACT_VM_RELOAD_SILENCED
 function SWEP:PrimaryAttack()
 	if not self:CanPrimaryAttack() then return end
 
+	self:EmitSound("weapons/grenade_launcher1.wav")
+
 	if SERVER then
 		local ply = self.Owner
 

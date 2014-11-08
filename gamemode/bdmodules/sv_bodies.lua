@@ -13,7 +13,7 @@ hook.Add("Think", "BDHandleBodyDrag", function()
 			if IsValid(phys) then
 				local vec = target - phys:GetPos()
 				local len = vec:Length()
-				if len > 40 then
+				if len > 40 or not ply:KeyDown(IN_DUCK) then
 					ply.BD_DragData = nil
 					return
 				end

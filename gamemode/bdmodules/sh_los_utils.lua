@@ -21,11 +21,10 @@ function bd.ComputeLos(obj1, obj2)
 		start = pos1,
 		endpos = pos2,
 		filter = function(ent) return not (ent == obj1 or ent == obj2) end,
-		mask = MASK_OPAQUE + CONTENTS_IGNORE_NODRAW_OPAQUE + CONTENTS_MONSTER
+		mask = MASK_OPAQUE + CONTENTS_IGNORE_NODRAW_OPAQUE
 	}
 
 	local res = not tr.Hit
-	--debugoverlay.Line(pos1, pos2, 0.1, Color(res and 0 or 255, res and 255 or 0, 0))
 
 	return res
 end

@@ -8,6 +8,7 @@
 
 @PointClass base(Targetname, Origin) studio("models/props/cs_office/computer_monitor.mdl") = bd_camera_monitor : "BudgetDay security camera monitor"
 [
+	cameraoffset(integer)	:	"Camera Offset"	:	0	:	"From which camera should the camera feed be started"
 ]
 
 @PointClass base(Targetname, Origin) = bd_npc_poi : "A point of interest"

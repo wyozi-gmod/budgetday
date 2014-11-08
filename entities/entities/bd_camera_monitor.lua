@@ -5,6 +5,13 @@ ENT.Model = Model("models/props/cs_office/computer_monitor.mdl")
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Entity", 0, "ActiveCamera")
+	self:NetworkVar("Int", 0, "CameraOffset", {KeyName = "cameraoffset"})
+end
+
+function ENT:KeyValue( key, value )
+	if (self:SetNetworkKeyValue(key, value)) then
+		return
+	end
 end
 
 function ENT:Initialize()
@@ -22,7 +29,13 @@ function ENT:Think()
 		if not self.NextCameraSwap or self.NextCameraSwap <= CurTime() then
 			local cam_cycle = ents.FindByClass("bd_camera")
 
-			local nextcam = table.FindNext(cam_cycle, self:GetActiveCamera())
+			local nextcam
+			if not IsValid(self:GetActiveCamera()) then
+				nextcam = cam_cycle[(self:GetCameraOffset()+1)]
+			else
+				nextcam = table.FindNext(cam_cycle, self:GetActiveCamera())
+			end
+
 			self:SetActiveCamera(nextcam)
 			self.NextCameraSwap = CurTime() + 4
 		end

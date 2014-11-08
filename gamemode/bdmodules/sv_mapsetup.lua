@@ -26,10 +26,12 @@ local brain_generic = {
 
 		end
 	end,
-	SpotEntities = function(self, pos, dir, spotter_ent)
+	SpotEntities = function(self, pos, dir, spot_callback, spotter_ent)
 		local check_ents = {}
 		table.Add(check_ents, player.GetAll())
 		table.Add(check_ents, ents.FindByClass("prop_ragdoll"))
+
+		debugoverlay.Line(pos, pos+dir*100, 0.1)
 
 		for _,ce in pairs(check_ents) do
 			local targpos = ce:GetPos()
@@ -42,35 +44,49 @@ local brain_generic = {
 			local dot = dir:Dot(pos_diff_normal)
 			local dist = pos_diff:Length()
 
-			local is_los_clear = bd.ComputeLos(spotter_ent, ce)
+			local is_los_clear = bd.ComputeLos(spotter_ent:GetClass() == "bd_camera" and spotter_ent:GetCameraPosAng() or spotter_ent, ce)
 
-			if dist < 512 and dot > 0.6 and is_los_clear then
-				MsgN(ce, " getting spotted")
-				debugoverlay.Line(pos, targpos, 0.1, Color(255, 0, 0), true)
+			if dist < 1024 and dot > 0.5 and is_los_clear then
+				spot_callback({
+					ent = ce,
+					spotter_ent = spotter_ent,
+					pos = pos,
+					targpos = targpos,
+					dot = dot,
+					dist = dist
+				})
 			end
 		end
 	end,
-	SpotPosition = function(self, ent)
+	SpotPosition = function(self, ent, spot_callback)
 		self:CheckForCameras(ent:GetPos() + Vector(0,0,60), ent:GetAngles():Forward(), ent, function(pos, dir, spotter_ent)
-			self:SpotEntities(pos, dir, spotter_ent)
+			self:SpotEntities(pos, dir, spot_callback, spotter_ent)
 		end)
+	end,
+	Roam = function(self, data, ent, spot_callback)
+		ent.loco:SetAcceleration(100)
+		ent.loco:SetDesiredSpeed(100)
+		ent.loco:SetDeathDropHeight(40)
+		ent:StartActivity(ACT_WALK)
+		local p = table.Random(ents.FindByClass("bd_npc_poi")):GetPos()
+		ent:MoveToPos(p, {
+			terminate_condition = function()
+				self:SpotPosition(ent, spot_callback)
+				return false
+			end}
+		)
 	end,
 	Think = function(self, data, ent)
 		local stat, err = pcall(function()
-			self:SpotPosition(ent)
+			local spot_callback = function(data)
+				data.guard = ent
+				hook.Call("BDGuardSpotted", GAMEMODE, data)
+			end
+
+			self:SpotPosition(ent, spot_callback)
 
 			if data.type == "roaming" and (not data.NextRoam or data.NextRoam < CurTime()) then
-				ent.loco:SetAcceleration(100)
-				ent.loco:SetDesiredSpeed(100)
-				ent.loco:SetDeathDropHeight(40)
-				ent:StartActivity(ACT_WALK)
-				local p = table.Random(ents.FindByClass("bd_npc_poi")):GetPos()
-				ent:MoveToPos(p, {
-					terminate_condition = function()
-						self:SpotPosition(ent)
-						return false
-					end}
-				)
+				self:Roam(data, ent, spot_callback)
 
 				data.NextRoam = CurTime() + math.random(2, 15)
 			end

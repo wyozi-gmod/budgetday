@@ -88,9 +88,3 @@ concommand.Add("spawnnpc", function(ply)
 
 	npc:AddFlashlight()
 end)
-
-hook.Add("Think", "SADdadas", function()
-	for _,npc in pairs(ents.FindByClass("bd_ai_base")) do
-		debugoverlay.Line(npc:GetPos(), npc:GetPos()+npc:GetAngles():Forward()*100, 0.1)
-	end
-end)

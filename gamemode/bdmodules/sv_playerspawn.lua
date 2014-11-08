@@ -8,9 +8,11 @@ function GM:PlayerSpawn(ply)
 	ply:StripWeapons()
 	ply:Give("bd_aisah")
 	ply:Give("weapon_bd_usp")
+	ply:Give("weapon_bd_grapphook")
 
 	ply:GiveSkill("aisah")
 	ply:GiveSkill("aisah_vitalstats")
+	ply:GiveSkill("aisah_nightvision")
 
 	ply:SetWalkSpeed(170)
 	ply:SetRunSpeed(235)

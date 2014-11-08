@@ -36,17 +36,9 @@ function ENT:Think()
 	--debugoverlay.Line(cpos, cpos+cang:Forward()*100, 0.1)
 end
 
-interactions.Register("camera_bug", {
-	filter = function(ent, ply) return ent:GetClass() == "bd_camera" end,
-	help = function(ent, ply) return "Bug" end,
-	finish = function(ent, ply) end,
-	cancel = function(ent, ply) end,
-	length = function() return 5 end
-})
-
 interactions.Register("camera_mitm", {
 	filter = function(ent, ply) return ent:GetClass() == "bd_camera" end,
-	help = function(ent, ply) return "Hack camera feed" end,
+	help = function(ent, ply) return "Bug camera signal" end,
 	finish = function(ent, ply)
 		ply:GiveSkill("aisah_cameramitm")
 		ply:SetNWEntity("BD_CameraMITM", ent)

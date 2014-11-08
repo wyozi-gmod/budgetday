@@ -21,6 +21,14 @@ function ENT:IsHookedPosValid()
 	return self:GetHookedPos() ~= vector_origin
 end
 
+function ENT:HookPos(pos, descending)
+	self:SetHookedPos(pos)
+	self.HookTime = CurTime()
+	self.IsDescending = descending
+
+	self:EmitSound("physics/metal/metal_computer_impact_bullet1.wav")
+end
+
 function ENT:PhysicsCollide(data, phys)
 	-- Dont allow hooking to skybox
 	if data.HitEntity == game.GetWorld() then
@@ -32,9 +40,7 @@ function ENT:PhysicsCollide(data, phys)
 	end
 
 	if not self:IsHookedPosValid() then
-		self:SetHookedPos(data.HitPos)
-		self.HookTime = CurTime()
-		self.IsDescending = true
+		self:HookPos(data.HitPos, true)
 
 		self:SetMoveType(MOVETYPE_NONE)
 	end
@@ -61,9 +67,7 @@ function ENT:Think()
 		else
 			local tr = util.TraceLine{start = self:GetOwner():GetShootPos(), endpos = self:GetPos(), filter=function()return false end}
 			if tr.Hit then
-				self:SetHookedPos(tr.HitPos)
-				self.HookTime = CurTime()
-				self.IsDescending = false
+				self:HookPos(tr.HitPos, false)
 			end
 		end
 
