@@ -1,14 +1,14 @@
 
 local brain_generic = {
-	CheckForCameras = function(self, pos, dir, spotter_ent, callback, checked_monitors)
-		checked_monitors = checked_monitors or {}
+	CheckForCameras = function(self, pos, dir, spotter_ent, callback, checked_cameras)
+		checked_cameras = checked_cameras or {}
 
 		callback(pos, dir, spotter_ent)
 
 		local check_ents = ents.FindByClass("bd_camera_monitor")
 
 		for _,ce in pairs(check_ents) do
-			if table.HasValue(checked_monitors, ce) then continue end
+			if table.HasValue(checked_cameras, ce) then continue end
 
 			local pos_diff = (ce:GetPos() - pos)
 			local pos_diff_normal = pos_diff:GetNormalized()
@@ -16,11 +16,11 @@ local brain_generic = {
 			local dist = pos_diff:Length()
 
 			if dist < 512 and dot > 0.25 then
-				table.insert(checked_monitors, ce)
 				local acam = ce:GetActiveCamera()
-				if IsValid(acam) then
+				if IsValid(acam) and not table.HasValue(checked_cameras, acam) then
+					table.insert(checked_cameras, acam)
 					local cpos, cang = acam:GetCameraPosAng()
-					self:CheckForCameras(cpos, cang:Forward(), ce, callback, checked_monitors)
+					self:CheckForCameras(cpos, cang:Forward(), acam, callback, checked_cameras)
 				end
 			end
 
@@ -42,15 +42,10 @@ local brain_generic = {
 			local dot = dir:Dot(pos_diff_normal)
 			local dist = pos_diff:Length()
 
-			local is_los_clear = ce:IsLineOfSightClear(pos)
-
-			-- is_los_clear failed (fails on eg ragdolls) so we try to do LOS check the other way
-			if is_los_clear == nil then
-				is_los_clear = spotter_ent:IsLineOfSightClear(targpos)
-			end
+			local is_los_clear = bd.ComputeLos(spotter_ent, ce)
 
 			if dist < 512 and dot > 0.6 and is_los_clear then
-				--MsgN(ce, " getting spotted")
+				MsgN(ce, " getting spotted")
 				debugoverlay.Line(pos, targpos, 0.1, Color(255, 0, 0), true)
 			end
 		end
@@ -89,6 +84,10 @@ local brain_generic = {
 		return CurTime()
 	end
 }
+
+for _,npc in pairs(ents.FindByClass("bd_ai_base")) do
+	npc.Brain = brain_generic
+end
 
 local function SpawnMapNPCs()
 	local spawner_ents = ents.FindByClass("bd_npc_spawn")

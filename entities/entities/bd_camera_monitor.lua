@@ -24,7 +24,7 @@ function ENT:Think()
 
 			local nextcam = table.FindNext(cam_cycle, self:GetActiveCamera())
 			self:SetActiveCamera(nextcam)
-			self.NextCameraSwap = CurTime() + 5
+			self.NextCameraSwap = CurTime() + 4
 		end
 	end
 end
