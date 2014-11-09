@@ -5,7 +5,8 @@ local function ToVector(obj)
 
 	if obj.IsValid and IsValid(obj) then
 		if obj.EyePosN then return obj:EyePosN() end -- Used in bd_ai_base
-		if obj.EyePos then return obj:EyePos() end
+		if obj:IsPlayer() and obj.EyePos then return obj:EyePos() end
+		if obj.WorldSpaceCenter then return obj:WorldSpaceCenter() end
 		if obj.OBBCenter then return obj:LocalToWorld(obj:OBBCenter()) end
 		return obj:GetPos()
 	end
@@ -25,6 +26,8 @@ function bd.ComputeLos(obj1, obj2)
 	}
 
 	local res = not tr.Hit
+
+	--debugoverlay.Line(pos1, pos2, 0.1, Color(0, res and 255 or 0, 0))
 
 	return res
 end
