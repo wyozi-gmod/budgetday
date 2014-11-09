@@ -2,8 +2,6 @@ hook.Add("BDGuardSpotted", "BDRaiseGuardSuspicion", function(data)
 	local guard = data.guard
 	local ent = data.ent
 
-	guard.BrainData.Suspicion = guard.BrainData.Suspicion or 0
-
 	local base_incr
 	if ent:GetClass() == "prop_ragdoll" then
 		base_incr = 0.15
@@ -16,9 +14,32 @@ hook.Add("BDGuardSpotted", "BDRaiseGuardSuspicion", function(data)
 		local dist_mul = math.Clamp(1 / (data.dist / 128), 0, 1)
 		local incr = base_incr * dist_mul
 
-		guard.BrainData.Suspicion = guard.BrainData.Suspicion + incr
-		MsgN(guard, " spotted ", ent, " using ", data.spotter_ent, " (susp: " , guard.BrainData.Suspicion, ")")
-
+		guard:NotifyDistraction({level = incr, pos = ent:GetPos(), cause = "Spotted " .. tostring(ent:GetClass())})
 	end
 
+end)
+
+hook.Add("EntityEmitSound", "BDDetectSounds", function(data)
+	local ent = data.Entity
+	if IsValid(ent) and data.Pos then
+		local suspicion = 0.01
+		local cause = "Unknown sound"
+		if data.Channel == 4 then -- Footsteps etc..
+			suspicion = 0.02
+			cause = "Footstep"
+		elseif data.Channel == 1 then -- weapon
+			suspicion = 0.1
+			cause = "Weapon shot"
+		end
+
+		for _,npc in pairs(ents.FindByClass("bd_ai_base")) do
+			local dist = npc:GetPos():Distance(data.Pos)
+			local suspicionmul = math.Clamp(1 / (dist / 64), 0, 1)
+
+			local level = suspicionmul * suspicion
+			if level > 0.001 then
+				npc:NotifyDistraction({level = suspicionmul*suspicion, pos = data.Pos, cause = cause})
+			end
+		end
+	end
 end)

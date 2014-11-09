@@ -41,6 +41,7 @@ function SWEP:PrimaryAttack()
 
 		local physrope = ents.Create("bd_physrope")
 		physrope:SetPos(ply:GetShootPos() + ply:GetAimVector()*50)
+		self.PhysRope = physrope
 
 		local ang = ply:EyeAngles()
 		ang:RotateAroundAxis(ang:Right(), 90)
@@ -55,6 +56,12 @@ function SWEP:PrimaryAttack()
 	end
 end
 
+function SWEP:SecondaryAttack()
+	if SERVER and IsValid(self.PhysRope) then
+		self.PhysRope:Remove()
+		self:SetNextPrimaryFire(CurTime() + 1)
+	end
+end
 
 if CLIENT then
 	function SWEP:GetWorldPos()

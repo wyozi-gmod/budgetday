@@ -72,7 +72,7 @@ if CLIENT then
 						CamData.y = 0
 						CamData.w = 300
 						CamData.h = 256
-						CamData.fov = 80
+						CamData.fov = 75
 						--[[CamData.ortho = true
 						local w = 130
 						CamData.ortholeft = -w

@@ -49,7 +49,8 @@ end
 function ENT:Think()
 	if SERVER then
 		if self:IsHookedPosValid() then
-			local diff = (self:GetHookedPos() - self:GetOwner():GetPos())
+			-- We add a Vec(0, 0, 20) if we're ascensing to make it easier to eg. get up a vent
+			local diff = ((self:GetHookedPos() + (self.IsDescending and vector_origin or Vector(0, 0, 20))) - self:GetOwner():GetPos())
 			if (not self.IsDescending and diff:Length() < 50 and diff.z < 0) or (CurTime() - self.HookTime) > 10 then
 				self:Remove()
 				return

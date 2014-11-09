@@ -4,6 +4,7 @@ ENT.Base 			= "base_nextbot"
 ENT.Spawnable		= true
 
 function ENT:SetupDataTables()
+	self:NetworkVar("Float", 0, "DistractionLevel")
 end
 
 function ENT:Initialize()
@@ -14,7 +15,9 @@ end
 
 -- So confusing
 function ENT:EyePosN()
-	return self:EyePos() + (SERVER and Vector(0, 0, 32) or Vector(0, 0, 64))
+	local headbone = self:LookupBone("ValveBiped.Bip01_Head1")
+	local headpos = self:GetBonePosition(headbone)
+	return headpos
 end
 
 function ENT:IsPointOnSight(p)
@@ -184,6 +187,19 @@ if SERVER then
 
 	function ENT:UpdateTransmitState()
 		return TRANSMIT_ALWAYS
+	end
+
+	function ENT:NotifyDistraction(data)
+		self:SetDistractionLevel(self:GetDistractionLevel() + data.level)
+
+		self.DistractionHistory = self.DistractionHistory or {}
+		
+		table.insert(self.DistractionHistory, {
+			happened = CurTime(),
+			data = data
+		})
+
+		MsgN(self, " distraction: ", math.Round(data.level, 3) , " to ", self:GetDistractionLevel(), " caused by ", data.cause)
 	end
 
 	-- Once again some nice code from TTT..
