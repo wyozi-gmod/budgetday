@@ -11,16 +11,32 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Int", 1, "ObjectiveItemsPicked")
 end
 
+function ENT:GetNextObjective()
+	return ents.FindByName(self:GetNextObjectiveName())[1]
+end
+
 function ENT:KeyValue( key, value )
 	if (self:SetNetworkKeyValue(key, value)) then
 		return
 	end
 
+	if key == "OnEndObjective" then
+		self:StoreOutput(key, value)
+	end
+
 	MsgN("Objective ", key, " = ", value)
 end
 
-function ENT:GetNextObjective()
-	return ents.FindByName(self:GetNextObjectiveName())[1]
+function ENT:AcceptInput(name, activator)
+	if name == "SetAsMainObjective" then
+		SetGlobalEntity("Objective", self)
+	end
+end
+
+function ENT:CheckObjectItemCount()
+	if self:GetObjectiveItemRequirement() > 0 and self:GetObjectiveItemsPicked() >= self:GetObjectiveItemRequirement() then
+		self:TriggerOutput("OnEndObjective", self)
+	end
 end
 
 -- We want access to objective information from all around the map..

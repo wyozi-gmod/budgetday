@@ -45,6 +45,13 @@ function ENT:InteractionFinished(ply)
 	else
 		self:Remove()
 	end
+
+	-- Increase the ObjectiveItemsPicked counter in parent objective
+	local obj = self:GetObjective()
+	if IsValid(obj) then
+		obj:SetObjectiveItemsPicked(obj:GetObjectiveItemsPicked() + 1)
+		obj:CheckObjectItemCount()
+	end
 end
 function ENT:InteractionCanceled(ply)
 	self:TriggerOutput("OnCancelInteraction", ply)
