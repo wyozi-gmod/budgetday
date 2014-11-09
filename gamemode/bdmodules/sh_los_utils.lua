@@ -1,13 +1,21 @@
 --Line of sight related utils
 
-local function ToVector(obj)
+function bd.GetEntVector(obj, is_second_obj)
 	if type(obj) == "Vector" then return obj end
 
 	if obj.IsValid and IsValid(obj) then
-		if obj.EyePosN then return obj:EyePosN() end -- Used in bd_ai_base
 		if obj:IsPlayer() and obj.EyePos then return obj:EyePos() end
-		if obj.WorldSpaceCenter then return obj:WorldSpaceCenter() end
-		if obj.OBBCenter then return obj:LocalToWorld(obj:OBBCenter()) end
+
+		if is_second_obj then
+			if obj.WorldSpaceCenter then return obj:WorldSpaceCenter() end
+			if obj.OBBCenter then return obj:LocalToWorld(obj:OBBCenter()) end
+			if obj.EyePosN then return obj:EyePosN() end -- Used in bd_ai_base
+		else
+			if obj.EyePosN then return obj:EyePosN() end -- Used in bd_ai_base
+			if obj.WorldSpaceCenter then return obj:WorldSpaceCenter() end
+			if obj.OBBCenter then return obj:LocalToWorld(obj:OBBCenter()) end
+		end
+		
 		return obj:GetPos()
 	end
 
@@ -15,8 +23,8 @@ local function ToVector(obj)
 end
 
 function bd.ComputeLos(obj1, obj2)
-	local pos1 = ToVector(obj1)
-	local pos2 = ToVector(obj2)
+	local pos1 = bd.GetEntVector(obj1)
+	local pos2 = bd.GetEntVector(obj2, true)
 
 	local tr = util.TraceLine {
 		start = pos1,

@@ -2,7 +2,7 @@ versioninfo
 {
 	"editorversion" "400"
 	"editorbuild" "6412"
-	"mapversion" "274"
+	"mapversion" "278"
 	"formatversion" "100"
 	"prefab" "0"
 }
@@ -20,7 +20,7 @@ viewsettings
 world
 {
 	"id" "1"
-	"mapversion" "274"
+	"mapversion" "278"
 	"classname" "worldspawn"
 	"detailmaterial" "detail/detailsprites"
 	"detailvbsp" "detail.vbsp"
@@ -20313,7 +20313,7 @@ entity
 	"id" "20312"
 	"classname" "bd_objective_item"
 	"angles" "0 270 0"
-	"carriedbyply" "No"
+	"carriedbyply" "1"
 	"highlightitem" "No"
 	"interacttime" "1.0"
 	"model" "models/props_lab/binderblue.mdl"
@@ -20333,7 +20333,7 @@ entity
 	"id" "20372"
 	"classname" "bd_objective_item"
 	"angles" "0 270 0"
-	"carriedbyply" "No"
+	"carriedbyply" "1"
 	"highlightitem" "No"
 	"interacttime" "1.0"
 	"model" "models/props_lab/binderredlabel.mdl"
@@ -20353,7 +20353,7 @@ entity
 	"id" "20378"
 	"classname" "bd_objective_item"
 	"angles" "0 90 0"
-	"carriedbyply" "No"
+	"carriedbyply" "1"
 	"highlightitem" "No"
 	"interacttime" "1.0"
 	"model" "models/props_lab/bindergreenlabel.mdl"

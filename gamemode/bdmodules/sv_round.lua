@@ -1,5 +1,6 @@
 
 local default_round_lengths = {
+	["first_pre"] = 10,
 	["pre"] = 2,
 	["active"] = 60 * 7,
 	["post"] = 1
@@ -50,8 +51,10 @@ local function RoundTick()
 
 	local round_elapsed = CurTime() - GetGlobalFloat("roundstart", 0)
 	if state == "pre" then
-		if round_elapsed > default_round_lengths.pre and #player.GetAll() > 0 then
+		local len = bd.FirstRoundPlayed and default_round_lengths.pre or default_round_lengths.first_pre
+		if round_elapsed > len and #player.GetAll() > 0 then
 			SetRoundState("active")
+			bd.FirstRoundPlayed = true
 		end
 	elseif state == "active" then
 		local alive = false

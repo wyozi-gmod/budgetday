@@ -1,6 +1,6 @@
 
 local detection_ranges = {
-	["bd_camera"] = {dist = 512, dot = 0.6},
+	["bd_camera"] = {dist = 768, dot = 0.65},
 	["bd_ai_base"] = {dist = 768, dot = 0.5},
 	default = {dist = 512, dot = 0.5}
 }
@@ -118,8 +118,7 @@ local brain_generic = {
 	Think = function(self, data, ent)
 		local stat, err = pcall(function()
 			if ent:GetDistractionLevel() >= 1 then
-				ent:StartActivity( ACT_IDLE )
-				return 1
+				-- Raise alarm or whatevers here and return
 			end
 			local spot_callback = function(data)
 				data.guard = ent

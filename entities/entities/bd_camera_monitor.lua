@@ -48,9 +48,9 @@ function ENT:UpdateTransmitState()
 end
 
 interactions.Register("cameramonitor_bug", {
-	filter = function(ent, ply) return ent:GetClass() == "bd_camera_monitor" end,
+	filter = function(ent, ply) return ent:GetClass() == "bd_camera_monitor" and not ent:GetNWBool("Bugged") end,
 	help = function(ent, ply) return "Bug" end,
-	finish = function(ent, ply) end,
+	finish = function(ent, ply) ent:SetNWBool("Bugged", true) end,
 	cancel = function(ent, ply) end,
 	length = function() return 5 end
 })
