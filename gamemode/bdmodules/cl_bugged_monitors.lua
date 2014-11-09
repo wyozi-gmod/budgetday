@@ -27,7 +27,7 @@ local function GetMonitorObjects(monitor, callback)
 		--MsgN(ce, " dist: ", (dist < reqval.dist), " dot: ", (dot < reqval.dot), " los: ", is_los_clear)
 
 		if dist < reqval.dist and dot > reqval.dot and is_los_clear then
-			callback(ce)
+			callback(ce, nil, acam)
 		end
 	end
 
@@ -38,7 +38,7 @@ hook.Add("PostDrawOpaqueRenderables", "BDDrawObjectsThroughBuggedCameras", funct
 	local highlight_objs = {}
     for _,monitor in pairs(ents.FindByClass("bd_camera_monitor")) do
     	if monitor:GetNWBool("Bugged") then
-    		GetMonitorObjects(monitor, function(e, clr) table.insert(highlight_objs, {ent=e, clr=clr}) end)
+    		GetMonitorObjects(monitor, function(e, clr, mon) table.insert(highlight_objs, {ent=e, clr=clr, mon=mon}) end)
     	end
     end
 
@@ -54,6 +54,10 @@ hook.Add("PostDrawOpaqueRenderables", "BDDrawObjectsThroughBuggedCameras", funct
     		render.SetColorModulation(1, 0.5, 0)
     	end
     	obj.ent:DrawModel()
+
+    	if IsValid(obj.mon) then
+    		render.DrawLine(bd.GetEntVector(obj.mon), bd.GetEntVector(obj.ent), obj.clr or Color(255, 127, 0), false)
+    	end
     end
 
     render.SuppressEngineLighting(false)

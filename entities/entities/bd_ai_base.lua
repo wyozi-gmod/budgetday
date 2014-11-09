@@ -44,11 +44,11 @@ if SERVER then
 	function ENT:AddFlashlight()
 		local shootpos = self:GetAttachment(self:LookupAttachment("anim_attachment_LH"))
 
-		local wep = ents.Create("gmod_lamp")
+		local wep = ents.Create("bd_lamp")
 		wep:SetModel(Model("models/maxofs2d/lamp_flashlight.mdl"))
 		wep:SetOwner(self)
 
-		wep:SetFlashlightTexture("effects/flashlight001")
+		wep:SetFlashlightTexture("effects/flashlight/soft")
 		wep:SetColor(Color(255, 255, 255))
 		wep:SetDistance(512)
 		wep:SetBrightness(1)

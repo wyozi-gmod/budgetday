@@ -11,6 +11,7 @@ function bd.GetEntVector(obj, is_second_obj)
 			if obj.OBBCenter then return obj:LocalToWorld(obj:OBBCenter()) end
 			if obj.EyePosN then return obj:EyePosN() end -- Used in bd_ai_base
 		else
+			if obj.GetCameraPosAng then return obj:GetCameraPosAng() end
 			if obj.EyePosN then return obj:EyePosN() end -- Used in bd_ai_base
 			if obj.WorldSpaceCenter then return obj:WorldSpaceCenter() end
 			if obj.OBBCenter then return obj:LocalToWorld(obj:OBBCenter()) end

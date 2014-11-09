@@ -81,7 +81,7 @@ local brain_generic = {
 			local dot = dir:Dot(pos_diff_normal)
 			local dist = pos_diff:Length()
 
-			local is_los_clear = bd.ComputeLos(spotter_ent:GetClass() == "bd_camera" and spotter_ent:GetCameraPosAng() or spotter_ent, ce)
+			local is_los_clear = bd.ComputeLos(spotter_ent, ce)
 
 			local reqval = detection_ranges[spotter_ent:GetClass()] or detection_ranges.default
 
