@@ -3,21 +3,72 @@
 
 @PointClass base(Targetname, Origin) studio("models/props/cs_assault/camera.mdl") = bd_camera : "BudgetDay security camera"
 [
-	cameraname(string)	:	"Camera Name"	:	""	:	"The camera name shown in security camera monitor"
+	cameraname(string) : "Camera Name" : ""	: "The camera name shown in security camera monitor"
 ]
 
 @PointClass base(Targetname, Origin) studio("models/props/cs_office/computer_monitor.mdl") = bd_camera_monitor : "BudgetDay security camera monitor"
 [
-	cameraoffset(integer)	:	"Camera Offset"	:	0	:	"From which camera should the camera feed be started"
-]
-
-@PointClass base(Targetname, Origin) = bd_npc_poi : "A point of interest"
-[
-	targetnpcs(string)	:	"Target NPCs"	:	""	:	"What type of npcs should use this POI. Currently not used"
-	priority(float)	:	"Priority"	:	"100.0"	:	"How high should NPCs prioritize this POI. Negative priority is never considered. Priority is relative. There are no absolute 'origins' for priority other than the default value."
+	cameraoffset(integer) : "Camera Offset" : 0 : "From which camera should the camera feed be started"
 ]
 
 @PointClass base(Targetname, Origin, Angles) studio("models/player.mdl") = bd_npc_spawn : "A spawnpoint for guards"
 [
-	guardtype(string)	:	"Guard type"	:	"roaming"	:	"Choices: 'roaming', 'passive'"
+	guardtype(choices) : "Guard Type" : "roaming" =
+	[
+		"roaming" : "Roaming"
+		"passive" : "Passive"
+	]
+]
+
+@PointClass base(Targetname, Origin) = bd_npc_poi : "A point of interest"
+[
+	targetnpcs(string) : "Target NPCs" : "" : "What type of npcs should use this POI. Currently not used"
+	priority(float) : "Priority" : "100.0" : "How high should NPCs prioritize this POI. Negative priority is never considered. Priority is relative. There are no absolute 'origins' for priority other than the default value."
+]
+
+@PointClass base(Origin) = bd_mapsettings : "BD Map settings"
+[
+	firstobjective(target_destination) : "First Objective" : "" : "Should point to the bd_objective that starts the mission"
+]
+
+@PointClass base(Targetname, Origin, Angles) = bd_objective : "An infonode for objectives"
+[
+	description(string) : "Description" : "" : "Description of this objective. Shown in tab menu. Should contain full instructions for how to complete this objective"
+
+	nextobjective(target_destination) : "Next objective" : "" : "The next main objective. Only used for informative purposes. To actually proceed to the next objective, use SetAsMainObjective on the next objective"
+
+	objectiveitems(integer) : "Objective Item Requirement" : 0 : "A helper function. If this amount of bd_objective_item entities that are linked to this objective are collected, the objective automatically ends. Set zero to disable."
+
+	input SetAsMainObjective(void) : "Sets this objective as the current main objective"
+
+	input SetAsSecondaryObjective(string) : "If there is no secondary objective going on named as given string, starts a new secondary objective. If there exists a secondary objective with given name, replaces it with this objective (effectively making this objective a sequel to the replaced objective)"
+
+	output OnStartObjective(void) : "Called when this objective starts"
+	output OnEndObjective(void) : "Called when this objective ends"
+]
+
+@PointClass base(Targetname, Origin, Angles) studioprop() = bd_objective_item : "A generic item that is used in an objective"
+[
+	model(studio) : "World model" : "models/props_c17/BriefCase001a.mdl"
+
+	interacttime(float) : "Interact Duration" : "1.0" : "For how long does player need to interact with this item to pick it up"
+
+	objective(target_destination) : "Objective" : "" : "The objective this item is part of. Item can only be interacted with if that objective is currently active"
+
+	highlightitem(choices) : "Highlight Item" : "No" : "Should this item be highlighted on screen" =
+	[
+		0 : "No"
+		1 : "Yes"
+		2 : "Yes, and ignore Z (highlight through walls)"
+	]
+
+	carriedbyply(choices) : "Carried by Player" : "No" : "Does this item need to be carried by player. If not, interacting with this item will simply remove it." =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+
+	output OnStartInteraction(void) : "Called when player starts interaction with this item"
+	output OnFinishInteraction(void) : "Called when player finishes interaction with this item"
+	output OnCancelInteraction(void) : "Called when player cancels interaction with this item"
 ]

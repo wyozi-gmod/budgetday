@@ -2,7 +2,7 @@ versioninfo
 {
 	"editorversion" "400"
 	"editorbuild" "6412"
-	"mapversion" "239"
+	"mapversion" "274"
 	"formatversion" "100"
 	"prefab" "0"
 }
@@ -14,13 +14,13 @@ viewsettings
 	"bSnapToGrid" "1"
 	"bShowGrid" "1"
 	"bShowLogicalGrid" "0"
-	"nGridSpacing" "8"
+	"nGridSpacing" "2"
 	"bShow3DGrid" "0"
 }
 world
 {
 	"id" "1"
-	"mapversion" "239"
+	"mapversion" "274"
 	"classname" "worldspawn"
 	"detailmaterial" "detail/detailsprites"
 	"detailvbsp" "detail.vbsp"
@@ -13333,7 +13333,7 @@ entity
 	"id" "16"
 	"classname" "info_player_terrorist"
 	"angles" "0 90 0"
-	"origin" "0 -1663.29 65"
+	"origin" "64 -1792 65"
 	editor
 	{
 		"color" "220 30 220"
@@ -13353,7 +13353,7 @@ entity
 	"duskscale" "1.0"
 	"fadebias" "0.02"
 	"hdrscale" "0.66"
-	"origin" "214.63 -1663.07 73"
+	"origin" "216 -1664 72"
 	"starfade" "0.40"
 	"starscale" "1.5"
 	"starspeed" "0.01"
@@ -13382,7 +13382,7 @@ entity
 	"_lightscaleHDR" "1"
 	"angles" "0 0 0"
 	"SunSpreadAngle" "180"
-	"origin" "262.148 -1664 74"
+	"origin" "240 -1664 72"
 	editor
 	{
 		"color" "220 30 220"
@@ -20140,6 +20140,232 @@ entity
 		"visgroupshown" "1"
 		"visgroupautoshown" "1"
 		"logicalpos" "[0 14500]"
+	}
+}
+entity
+{
+	"id" "17280"
+	"classname" "bd_mapsettings"
+	"firstobjective" "objective_findbooks"
+	"origin" "192 -1664 72"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "18236"
+	"classname" "bd_objective"
+	"angles" "0 0 0"
+	"description" "There are three books hidden in this library. Find them all."
+	"nextobjective" "objective_escape"
+	"objectiveitems" "3"
+	"origin" "8 752 336"
+	"targetname" "objective_findbooks"
+	connections
+	{
+		"OnEndObjective" "objective_findbriefcase,SetAsSecondaryObjective,,0,-1"
+	}
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "18283"
+	"classname" "bd_objective"
+	"angles" "0 0 0"
+	"description" "Find a briefcase and search it for information"
+	"origin" "-176 120 96"
+	"targetname" "objective_findbriefcase"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "18298"
+	"classname" "bd_objective_item"
+	"angles" "0 0 0"
+	"carriedbyply" "No"
+	"highlightitem" "No"
+	"interacttime" "5.0"
+	"model" "models/props_c17/BriefCase001a.mdl"
+	"objective" "objective_findbriefcase"
+	"origin" "-200 152 74"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 500]"
+	}
+}
+entity
+{
+	"id" "19287"
+	"classname" "info_player_terrorist"
+	"angles" "0 90 0"
+	"origin" "-64 -1792 65"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 2500]"
+	}
+}
+entity
+{
+	"id" "19289"
+	"classname" "info_player_terrorist"
+	"angles" "0 90 0"
+	"origin" "-192 -1792 65"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 2500]"
+	}
+}
+entity
+{
+	"id" "19291"
+	"classname" "prop_static"
+	"angles" "0 346 0"
+	"fademindist" "-1"
+	"fadescale" "1"
+	"model" "models/props/de_train/utility_truck.mdl"
+	"skin" "0"
+	"solid" "6"
+	"origin" "-360 -1824 64"
+	editor
+	{
+		"color" "255 255 0"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 500]"
+	}
+}
+entity
+{
+	"id" "19334"
+	"classname" "info_player_terrorist"
+	"angles" "0 90 0"
+	"origin" "312 -1792 65"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 2500]"
+	}
+}
+entity
+{
+	"id" "19336"
+	"classname" "info_player_terrorist"
+	"angles" "0 90 0"
+	"origin" "184 -1792 65"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 2500]"
+	}
+}
+entity
+{
+	"id" "19338"
+	"classname" "bd_objective"
+	"angles" "0 0 0"
+	"description" "Return books to the escape truck"
+	"origin" "-288 -1840 152"
+	"targetname" "objective_escape"
+	connections
+	{
+		"OnEndObjective" "objective_findbriefcase,SetAsSecondaryObjective,,0,-1"
+	}
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "20312"
+	"classname" "bd_objective_item"
+	"angles" "0 270 0"
+	"carriedbyply" "No"
+	"highlightitem" "No"
+	"interacttime" "1.0"
+	"model" "models/props_lab/binderblue.mdl"
+	"objective" "objective_findbooks"
+	"origin" "-552.21 1028 120"
+	"skin" "0"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "20372"
+	"classname" "bd_objective_item"
+	"angles" "0 270 0"
+	"carriedbyply" "No"
+	"highlightitem" "No"
+	"interacttime" "1.0"
+	"model" "models/props_lab/binderredlabel.mdl"
+	"objective" "objective_findbooks"
+	"origin" "583.79 1124 120"
+	"skin" "0"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "20378"
+	"classname" "bd_objective_item"
+	"angles" "0 90 0"
+	"carriedbyply" "No"
+	"highlightitem" "No"
+	"interacttime" "1.0"
+	"model" "models/props_lab/bindergreenlabel.mdl"
+	"objective" "objective_findbooks"
+	"origin" "345.79 668 120"
+	"skin" "0"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
 	}
 }
 cameras
