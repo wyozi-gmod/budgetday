@@ -37,6 +37,63 @@ hook.Add("Think", "BDHighlightSight", function()
 	end
 end)
 
+local function Map(tbl, fn)
+	local t = {}
+	for k,v in pairs(tbl) do
+		t[k] = fn(v, k)
+	end
+	return t
+end
+
+-- Filter for sequential tables
+local function FilterSeq(tbl, fn)
+	local t = {}
+	for k,v in pairs(tbl) do
+		if fn(v, k) then t[#t+1] = v end
+	end
+	return t
+end
+
+local function GroupSeq(tbl, fn)
+	local t = {}
+	for k,v in pairs(tbl) do
+		local group = fn(v, k)
+
+		t[group] = t[group] or {}
+		table.insert(t[group], v)
+	end
+	return t
+end
+
+local function FlattenAverage(tbl)
+	local t = {}
+	for k,v in pairs(tbl) do
+		local res = {}
+
+		local amount = 0
+		for k2,v2 in pairs(v) do
+			local meta = getmetatable(v2)
+			if res[k2] and meta and meta.__plus then
+				res[k2] = res[k2] + v2
+			else
+				res[k2] = v2
+			end 
+
+			amount = amount + 1
+		end
+
+		for k2,v2 in pairs(res) do
+			local meta = getmetatable(res[k2])
+			if meta and meta.__div then
+				res[k2] = v2 / amount
+			end
+		end
+
+		t[k] = res
+	end
+	return t
+end
+
 local brain_generic = {
 	CheckForCameras = function(self, pos, dir, spotter_ent, callback, checked_cameras)
 		checked_cameras = checked_cameras or {}
@@ -111,14 +168,59 @@ local brain_generic = {
 		ent:MoveToPos(p, {
 			terminate_condition = function()
 				self:SpotPosition(ent, spot_callback)
+				if ent:GetDistractionLevel() >= 1 then
+					return true
+				end
 				return false
 			end}
 		)
 	end,
+	AlarmedMode = function(self, data, ent)
+		if not data.IsAlarmed then
+			ent:PlaySequenceAndWait("drawpistol")
+			ent:AddFakeWeapon("models/weapons/w_pist_glock18.mdl")
+			--ent:PlaySequenceAndWait("Stand_to_crouchpistol")
+			--ent:SetSequence("Crouch_idle_pistol")
+			data.IsAlarmed = true
+		end
+
+		local shoot_targ
+		self:SpotPosition(ent, function(data)
+			if data.ent:IsPlayer() then shoot_targ = data.ent end
+		end)
+
+		if IsValid(shoot_targ) and bd.ComputeLos(ent, shoot_targ) then
+			ent.loco:FaceTowards(shoot_targ:GetBonePosition(shoot_targ:LookupBone("ValveBiped.Bip01_Spine")))
+
+			if not data.NextShoot or data.NextShoot <= CurTime() then
+
+				local bullet = {}
+
+				bullet.Num 	= 1
+				bullet.Src 	= ent:EyePosN()
+				bullet.Dir 	= ent:GetAngles():Forward()
+				bullet.Spread 	= Vector( 0.1, 0.1, 0 )	 -- Aim Cone
+				bullet.Tracer	= 1 -- Show a tracer on every x bullets 
+				bullet.Force	= 1 -- Amount of force to give to phys objects
+				bullet.Damage	= 25
+				bullet.AmmoType = "Pistol"
+
+				--debugoverlay.Line(bullet.Src, bullet.Src + bullet.Dir * 100, 2)
+				
+				ent:FireBullets( bullet )
+				ent:EmitSound(Sound( "Weapon_Glock.Single" ))
+
+				data.NextShoot = CurTime() + math.random(0.1, 1.5)
+			end
+
+		end
+
+		return 0
+	end,
 	Think = function(self, data, ent)
 		local stat, err = pcall(function()
 			if ent:GetDistractionLevel() >= 1 then
-				-- Raise alarm or whatevers here and return
+				return self:AlarmedMode(data, ent)
 			end
 			local spot_callback = function(data)
 				data.guard = ent
@@ -132,6 +234,12 @@ local brain_generic = {
 
 				data.NextRoam = CurTime() + math.random(2, 15)
 			end
+
+			--[[local hist = ent.DistractionHistory
+			hist = FilterSeq(hist, function(v) return (CurTime() - v.happened) < 10 end)
+			hist = GroupSeq(hist, function(v) return v.data.cause end)
+			hist = FlattenAverage(hist)
+			PrintTable(hist)]]
 
 			--data.IdleSequence = data.IdleSequence or ("LineIdle0" .. math.random(1, 2))
 			--ent:SetSequence(data.IdleSequence)

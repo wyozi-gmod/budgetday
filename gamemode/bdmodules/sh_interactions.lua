@@ -100,11 +100,16 @@ function plymeta:BD_GetInteractionProgress()
 	return 0
 end
 
+local max_dist = 128
+
 if SERVER then
 	util.AddNetworkString("bd_startinteract")
 	net.Receive("bd_startinteract", function(len, ply)
 		local ent = net.ReadEntity()
 		local ia_name = net.ReadString()
+
+		if not IsValid(ent) then return ply:ChatPrint("invalid ent") end
+		if ent:GetPos():Distance(ply:EyePos()) > max_dist then return ply:ChatPrint("too far") end
 
 		-- TODO verify distance to ent etc
 		local interaction = Get(ia_name)
@@ -126,16 +131,13 @@ if SERVER then
 
 				if IsValid(targ) then
 					local frac = ply:BD_GetInteractionProgress()
-					if frac >= 1 then
+					if targ:GetPos():Distance(ply:EyePos()) > max_dist then
+						meta.cancel(targ, ply, frac)
+						ply:BD_ClearInteraction()
+					elseif frac >= 1 then
 						meta.finish(targ, ply)
 						ply:BD_ClearInteraction()
 					end
-					--[[
-					if not ply:KeyDown(IN_USE) then
-						meta.cancel(targ, ply, frac)
-						ply:BD_ClearInteraction()
-					end
-					]]
 				else
 					ply:BD_ClearInteraction()
 				end
@@ -200,7 +202,7 @@ if CLIENT then
 			end
 		else
 			local tr = LocalPlayer():GetEyeTrace()
-			if IsValid(tr.Entity) then
+			if IsValid(tr.Entity) and tr.Entity:GetPos():Distance(LocalPlayer():EyePos()) <= max_dist then
 				local ias = tr.Entity:BD_GetValidInteractions(LocalPlayer())
 
 				local x = ScrW()/2 - 100

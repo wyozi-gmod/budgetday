@@ -4,12 +4,18 @@ ENT.Base 			= "base_nextbot"
 ENT.Spawnable		= true
 
 function ENT:SetupDataTables()
-	self:NetworkVar("Float", 0, "DistractionLevel")
+end
+
+function ENT:GetDistractionLevel()
+	return self:GetNWFloat("Detection", 0) or 0
+end
+function ENT:SetDistractionLevel(lvl)
+	return self:SetNWFloat("Detection", lvl)
 end
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel("models/odessa.mdl")
+		self:SetModel("models/Police.mdl")
 	end
 end
 
@@ -83,6 +89,15 @@ if SERVER then
 	    wep:Fire("setparentattachment", "anim_attachment_RH")
 	    wep:AddEffects(EF_BONEMERGE)
 	    wep:SetAngles(self:GetForward():Angle())
+
+	    self.PhysWeapon = wep
+
+	    -- If we had a flashlight, we remove that and attach a flashlight to our weapon
+	    if IsValid(self.Flashlight) then
+	    	self.Flashlight:Remove()
+
+	    	-- TODO attach flashlight
+	    end
 	end
 
 	function ENT:BehaveAct()
