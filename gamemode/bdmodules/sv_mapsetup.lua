@@ -181,7 +181,6 @@ local brain_generic = {
 				end
 				return false
 			end,
-			draw = true,
 			repath = 1
 		})
 	end,
