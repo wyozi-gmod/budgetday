@@ -55,14 +55,14 @@
 
 	objective(target_destination) : "Objective" : "" : "The objective this item is part of. Item can only be interacted with if that objective is currently active"
 
-	highlightitem(choices) : "Highlight Item" : "No" : "Should this item be highlighted on screen" =
+	highlightitem(choices) : "Highlight Item" : "0" : "Should this item be highlighted on screen" =
 	[
 		0 : "No"
 		1 : "Yes"
 		2 : "Yes, and ignore Z (highlight through walls)"
 	]
 
-	carriedbyply(choices) : "Carried by Player" : "No" : "Does this item need to be carried by player. If not, interacting with this item will simply remove it." =
+	carriedbyply(choices) : "Carried by Player" : "0" : "Does this item need to be carried by player. If not, interacting with this item will simply remove it." =
 	[
 		0 : "No"
 		1 : "Yes"
