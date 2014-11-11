@@ -16,6 +16,8 @@ end
 function ENT:Initialize()
 	if SERVER then
 		self:SetModel("models/Police.mdl")
+
+		self:SetHealth(100)
 	end
 end
 
@@ -253,6 +255,12 @@ if SERVER then
 			end
 		end
 
+	end
+
+	function ENT:OnInjured(dmginfo)
+		if dmginfo:IsBulletDamage() then
+			self:NotifyDistraction({level = 1, pos = dmginfo:GetDamagePosition(), cause = "Was damaged"})
+		end
 	end
 
 	function ENT:OnKilled( dmginfo )

@@ -26,7 +26,7 @@ hook.Add("PostDrawOpaqueRenderables", "BDHighlightObjectives", function()
 
     for _,obj in pairs(highlight_objs) do
     	cam.IgnoreZ(obj.ignore_z)
-    	render.SetColorModulation(0, 1, 0)
+    	render.SetColorModulation(0, 0, 1)
     	obj.ent:DrawModel()
     end
 
