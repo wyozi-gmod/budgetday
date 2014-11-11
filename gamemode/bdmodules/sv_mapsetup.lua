@@ -159,23 +159,33 @@ local brain_generic = {
 			self:SpotEntities(pos, dir, spot_callback, spotter_ent)
 		end)
 	end,
-	Roam = function(self, data, ent, spot_callback)
-		ent.loco:SetAcceleration(100)
-		ent.loco:SetDesiredSpeed(100)
+	StartMovingTo = function(self, data, ent, move_data)
+		if move_data.type == "run" then
+			ent.loco:SetAcceleration(140)
+			ent.loco:SetDesiredSpeed(140)
+			ent:StartActivity(ACT_RUN)
+		else
+			ent.loco:SetAcceleration(100)
+			ent.loco:SetDesiredSpeed(100)
+			ent:StartActivity(ACT_WALK)
+		end
 		ent.loco:SetDeathDropHeight(40)
-		ent:StartActivity(ACT_WALK)
-		local p = table.Random(ents.FindByClass("bd_npc_poi")):GetPos()
-		ent:MoveToPos(p, {
+
+		ent:MoveToPos(move_data.pos, {
 			terminate_condition = function()
-				self:SpotPosition(ent, spot_callback)
-				if ent:GetDistractionLevel() >= 1 then
-					return true
+				if move_data.spot_callback then
+					self:SpotPosition(ent, move_data.spot_callback)
+					if ent:GetDistractionLevel() >= 1 then
+						return true
+					end
 				end
 				return false
-			end}
-		)
+			end,
+			draw = true,
+			repath = 1
+		})
 	end,
-	AlarmedMode = function(self, data, ent)
+	AlarmedMode = function(self, data, ent, poi)
 		if not data.IsAlarmed then
 			ent:PlaySequenceAndWait("drawpistol")
 			ent:AddFakeWeapon("models/weapons/w_pist_glock18.mdl")
@@ -196,9 +206,14 @@ local brain_generic = {
 
 				local bullet = {}
 
+				local shootpos = ent:GetAttachment(ent:LookupAttachment("anim_attachment_LH"))
+
+				local ang = ent:GetAngles()
+				local pos = shootpos.Pos + ang:Up() * 5
+
 				bullet.Num 	= 1
-				bullet.Src 	= ent:EyePosN()
-				bullet.Dir 	= ent:GetAngles():Forward()
+				bullet.Dir 	= ang:Forward()
+				bullet.Src 	= pos
 				bullet.Spread 	= Vector( 0.1, 0.1, 0 )	 -- Aim Cone
 				bullet.Tracer	= 1 -- Show a tracer on every x bullets 
 				bullet.Force	= 1 -- Amount of force to give to phys objects
@@ -210,17 +225,59 @@ local brain_generic = {
 				ent:FireBullets( bullet )
 				ent:EmitSound(Sound( "Weapon_Glock.Single" ))
 
-				data.NextShoot = CurTime() + math.random(0.1, 1.5)
-			end
+				local effectdata = EffectData()
+				effectdata:SetOrigin(bullet.Src)
+				effectdata:SetStart(bullet.Src)
+				effectdata:SetAngles(ang)
 
+				util.Effect( "MuzzleEffect", effectdata )
+
+				data.NextShoot = CurTime() + math.random(0.3, 0.6)
+			end
+		elseif poi then
+			ent.loco:FaceTowards(poi.pos)
+		--[[elseif poi and poi.level >= 0.2 and poi.pos:Distance(ent:GetPos()) > 400 then
+			self:StartMovingTo(data, ent, {
+				pos = poi.pos,
+				run = true
+			})]]
 		end
 
 		return 0
 	end,
 	Think = function(self, data, ent)
 		local stat, err = pcall(function()
+			local poi
+			if ent.DistractionHistory then
+				local hist = ent.DistractionHistory
+				hist = FilterSeq(hist, function(v) return (CurTime() - v.happened) < 10 end)
+				hist = GroupSeq(hist, function(v) return v.data.cause end)
+
+				-- TODO divide grouped data into subgroups based on positions
+
+				local flattened = {}
+				for cause, data in pairs(hist) do
+					local t = {pos = Vector(0, 0, 0), level = 0}
+
+					for _,d in pairs(data) do
+						t.pos = t.pos + d.data.pos
+						t.level = t.level + d.data.level
+					end
+
+					t.pos = t.pos / #data
+
+					flattened[cause] = t
+				end
+
+				for groupname,group in pairs(flattened) do
+					if group.level > 0 and (not poi or group.level > poi.level) then
+						poi = {pos = group.pos, level = group.level}
+					end
+				end
+			end
+
 			if ent:GetDistractionLevel() >= 1 then
-				return self:AlarmedMode(data, ent)
+				return self:AlarmedMode(data, ent, poi)
 			end
 			local spot_callback = function(data)
 				data.guard = ent
@@ -230,16 +287,19 @@ local brain_generic = {
 			self:SpotPosition(ent, spot_callback)
 
 			if data.type == "roaming" and (not data.NextRoam or data.NextRoam < CurTime()) then
-				self:Roam(data, ent, spot_callback)
+				self:StartMovingTo(data, ent, {
+					pos = table.Random(ents.FindByClass("bd_npc_poi")):GetPos(),
+					run = false,
+					spot_callback = spot_callback
+				})
 
 				data.NextRoam = CurTime() + math.random(2, 15)
 			end
 
-			--[[local hist = ent.DistractionHistory
-			hist = FilterSeq(hist, function(v) return (CurTime() - v.happened) < 10 end)
-			hist = GroupSeq(hist, function(v) return v.data.cause end)
-			hist = FlattenAverage(hist)
-			PrintTable(hist)]]
+			if poi and poi.level >= 0.25 then
+				ent.loco:FaceTowards(poi.pos)
+				--debugoverlay.Sphere(poi.pos, 16, 1)
+			end
 
 			--data.IdleSequence = data.IdleSequence or ("LineIdle0" .. math.random(1, 2))
 			--ent:SetSequence(data.IdleSequence)

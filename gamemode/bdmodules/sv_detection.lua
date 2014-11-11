@@ -21,24 +21,37 @@ end)
 
 hook.Add("EntityEmitSound", "BDDetectSounds", function(data)
 	local ent = data.Entity
-	if IsValid(ent) and data.Pos then
+
+	if IsValid(ent) then
 		local suspicion = 0.01
 		local cause = "Unknown sound"
+		local pos = data.Pos
+
+		local falloff = 64 -- How quickly suspicionvalue falls of over distance. Larger is less falloff
+
 		if data.Channel == 4 then -- Footsteps etc..
 			suspicion = 0.02
 			cause = "Footstep"
 		elseif data.Channel == 1 then -- weapon
-			suspicion = 0.1
+			local is_silenced = data.SoundName == "weapons/usp/usp1.wav"
+
+			suspicion = is_silenced and 0.1 or 1
 			cause = "Weapon shot"
+			pos = data.Entity:IsPlayer() and data.Entity:GetShootPos() or data.Entity:EyePosN()
+
+			-- Nonsilenced weapons are audible for really far away
+			if not is_silenced then falloff = 768 end
 		end
 
-		for _,npc in pairs(ents.FindByClass("bd_ai_base")) do
-			local dist = npc:GetPos():Distance(data.Pos)
-			local suspicionmul = math.Clamp(1 / (dist / 64), 0, 1)
+		if suspicion > 0 and pos then
+			for _,npc in pairs(ents.FindByClass("bd_ai_base")) do
+				local dist = npc:GetPos():Distance(pos)
+				local suspicionmul = math.Clamp(1 / (dist / falloff), 0, 1)
 
-			local level = suspicionmul * suspicion
-			if level > 0.001 then
-				npc:NotifyDistraction({level = suspicionmul*suspicion, pos = data.Pos, cause = cause})
+				local level = suspicionmul * suspicion
+				if level > 0.001 then
+					npc:NotifyDistraction({level = suspicionmul*suspicion, pos = pos, cause = cause})
+				end
 			end
 		end
 	end

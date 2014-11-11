@@ -47,6 +47,11 @@ function ENT:UpdateTransmitState()
 	return TRANSMIT_ALWAYS
 end
 
+function ENT:OnTakeDamage(dmginfo)
+	self:GetPhysicsObject():AddVelocity(dmginfo:GetDamageForce() * 0.05)
+	self:GibBreakServer(dmginfo:GetDamageForce())
+end
+
 interactions.Register("cameramonitor_bug", {
 	filter = function(ent, ply) return ent:GetClass() == "bd_camera_monitor" and not ent:GetNWBool("Bugged") end,
 	help = function(ent, ply) return "Bug" end,
