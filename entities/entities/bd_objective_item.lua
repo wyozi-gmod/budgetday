@@ -4,8 +4,8 @@ ENT.Type = "anim"
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Float", 0, "InteractLength", {KeyName = "interacttime"})
-	self:NetworkVar("Int", 0, "HighlightItemType")
-	self:NetworkVar("Bool", 0, "CarriedByPlayer")
+	self:NetworkVar("Int", 0, "HighlightItemType", {KeyName = "highlightitem"})
+	self:NetworkVar("Bool", 0, "CarriedByPlayer", {KeyName = "carriedbyply"})
 	self:NetworkVar("String", 0, "ObjectiveName", {KeyName = "objective"})
 end
 
@@ -16,16 +16,6 @@ function ENT:KeyValue( key, value )
 
 	if key == "model" then
 		self.Model = Model(value)
-	elseif key == "highlightitem" then
-		if value == "No" then
-			self:SetHighlightItemType(0)
-		elseif value == "Yes" then
-			self:SetHighlightItemType(1)
-		else
-			self:SetHighlightItemType(2)
-		end
-	elseif key == "carriedbyply" then
-		self:SetCarriedByPlayer(value == "Yes")
 	elseif key == "OnFinishInteraction" or key == "OnCancelInteraction" then
 		self:StoreOutput(key, value)
 	end
