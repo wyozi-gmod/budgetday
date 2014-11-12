@@ -258,6 +258,10 @@ if SERVER then
 	end
 
 	function ENT:OnInjured(dmginfo)
+		local pos = dmginfo:GetDamagePosition()
+
+		local hitgroup = 0
+		debugoverlay.Sphere(pos, 6, 1)
 		if dmginfo:IsBulletDamage() then
 			self:NotifyDistraction({level = 1, pos = dmginfo:GetDamagePosition(), cause = "Was damaged"})
 		end

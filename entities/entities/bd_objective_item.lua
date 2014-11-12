@@ -10,6 +10,7 @@ function ENT:SetupDataTables()
 end
 
 function ENT:KeyValue( key, value )
+	MsgN("Objective item ", key, " = ", value)
 	if (self:SetNetworkKeyValue(key, value)) then
 		return
 	end
@@ -20,7 +21,6 @@ function ENT:KeyValue( key, value )
 		self:StoreOutput(key, value)
 	end
 
-	MsgN("Objective item ", key, " = ", value)
 end
 
 function ENT:GetObjective()
