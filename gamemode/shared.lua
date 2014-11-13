@@ -1,3 +1,5 @@
+DeriveGamemode("sandbox")
+
 -- Helper functions to load files
 loader = {}
 
@@ -14,10 +16,8 @@ function loader.shared(file)
 end
 
 function loader.luafiles(folder, filfilter)
-	return file.Find("budgetday/gamemode/" .. folder .. "/" .. (filfilter or "*") .. ".lua", "LUA")
+	return file.Find("budgetday/gamemode/" .. folder .. "/" .. (filfilter or "*"), "LUA")
 end
-
-DeriveGamemode("sandbox")
 
 -- Global table for all storage needs
 bd = bd or {}
@@ -26,16 +26,24 @@ bd = bd or {}
 loader.client("libext/surface.lua")
 loader.shared("libext/misc.lua")
 
--- Load module files in bdmodules folder
-for _,fil in pairs(loader.luafiles("bdmodules", "sh_*")) do
-	loader.shared("bdmodules/" .. fil)
+-- Traverses through all folders and files in given folder and loads lua files from them
+local function LoadFromFolder(folder)
+	local _, folders = loader.luafiles(folder)
+	for _,fold in pairs(folders) do
+		LoadFromFolder(string.format("%s/%s", folder, fold))
+	end
+
+	for _,fil in pairs(loader.luafiles(folder, "sh_*.lua")) do
+		loader.shared(string.format("%s/%s", folder, fil))
+	end
+	for _,fil in pairs(loader.luafiles(folder, "cl_*.lua")) do
+		loader.client(string.format("%s/%s", folder, fil))
+	end
+	for _,fil in pairs(loader.luafiles(folder, "sv_*.lua")) do
+		loader.server(string.format("%s/%s", folder, fil))
+	end
 end
-for _,fil in pairs(loader.luafiles("bdmodules", "cl_*")) do
-	loader.client("bdmodules/" .. fil)
-end
-for _,fil in pairs(loader.luafiles("bdmodules", "sv_*")) do
-	loader.server("bdmodules/" .. fil)
-end
+LoadFromFolder("bdmodules")
 
 -- Load skills from "skills/" folder
 loader.shared("skills.lua")
