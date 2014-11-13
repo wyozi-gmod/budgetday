@@ -6,7 +6,7 @@ end
 function SKILL:UnRegisterVariables(ply)
 end
 
-bd.RegisterSkill("aisah_cameramitm", SKILL)
+bd.skills.Register("aisah_cameramitm", SKILL)
 
 if CLIENT then
 	hook.Add("PostDrawOpaqueRenderables", "BDDrawBuggedCameras", function()

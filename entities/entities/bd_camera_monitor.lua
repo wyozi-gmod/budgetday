@@ -52,7 +52,7 @@ function ENT:OnTakeDamage(dmginfo)
 	self:GibBreakServer(dmginfo:GetDamageForce())
 end
 
-interactions.Register("cameramonitor_bug", {
+bd.interactions.Register("cameramonitor_bug", {
 	filter = function(ent, ply) return ent:GetClass() == "bd_camera_monitor" and not ent:GetNWBool("Bugged") end,
 	help = function(ent, ply) return "Bug" end,
 	finish = function(ent, ply) ent:SetNWBool("Bugged", true) end,

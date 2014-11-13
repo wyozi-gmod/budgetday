@@ -22,6 +22,9 @@ end
 -- Global table for all storage needs
 bd = bd or {}
 
+-- Load module support
+loader.shared("modules.lua")
+
 -- Extend GMod libraries with our own functions
 loader.client("libext/surface.lua")
 loader.shared("libext/misc.lua")

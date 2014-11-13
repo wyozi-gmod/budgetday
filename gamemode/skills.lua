@@ -1,19 +1,19 @@
-bd.Skills = {}
+local MODULE = bd.module("skills")
 
-function bd.RegisterSkill(name, mod)
-	bd.Skills[name] = mod
+function MODULE.Register(name, mod)
+	MODULE.Skills[name] = mod
 end
 
-function bd.GetSkill(skill)
-	return bd.Skills[skill]
+function MODULE.Get(skill)
+	return MODULE.Skills[skill]
 end
 
-function bd.LoadSkills()
-	bd.Skills = {}
+function MODULE.Load()
+	MODULE.Skills = {}
 
 	for _,fil in pairs(loader.luafiles("skills")) do
 		loader.shared("skills/" .. fil)
 	end
 end
 
-bd.LoadSkills()
+MODULE.Load()

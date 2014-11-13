@@ -6,7 +6,7 @@ end
 function SKILL:UnRegisterVariables(ply)
 end
 
-bd.RegisterSkill("aisah_vitalstats", SKILL)
+bd.skills.Register("aisah_vitalstats", SKILL)
 
 if CLIENT then
 	local MOD = {}

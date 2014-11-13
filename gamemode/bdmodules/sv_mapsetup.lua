@@ -111,7 +111,7 @@ local brain_generic = {
 			local dist = pos_diff:Length()
 
 			local reqval = detection_ranges[spotter_ent:GetClass()] or detection_ranges.default
-			if dist < reqval.dist and dot > reqval.dot and bd.ComputeLos(spotter_ent, ce) then
+			if dist < reqval.dist and dot > reqval.dot and bd.util.ComputeLos(spotter_ent, ce) then
 				local acam = ce:GetActiveCamera()
 				if IsValid(acam) and not table.HasValue(checked_cameras, acam) then
 					table.insert(checked_cameras, acam)
@@ -138,7 +138,7 @@ local brain_generic = {
 			local dot = dir:Dot(pos_diff_normal)
 			local dist = pos_diff:Length()
 
-			local is_los_clear = bd.ComputeLos(spotter_ent, ce)
+			local is_los_clear = bd.util.ComputeLos(spotter_ent, ce)
 
 			local reqval = detection_ranges[spotter_ent:GetClass()] or detection_ranges.default
 
@@ -198,7 +198,7 @@ local brain_generic = {
 			if data.ent:IsPlayer() then shoot_targ = data.ent end
 		end)
 
-		if IsValid(shoot_targ) and bd.ComputeLos(ent, shoot_targ) then
+		if IsValid(shoot_targ) and bd.util.ComputeLos(ent, shoot_targ) then
 			ent.loco:FaceTowards(shoot_targ:GetBonePosition(shoot_targ:LookupBone("ValveBiped.Bip01_Spine")))
 
 			if not data.NextShoot or data.NextShoot <= CurTime() then

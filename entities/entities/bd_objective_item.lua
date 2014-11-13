@@ -47,7 +47,7 @@ function ENT:InteractionCanceled(ply)
 	self:TriggerOutput("OnCancelInteraction", ply)
 end
 
-interactions.Register("objective_item_pickup", {
+bd.interactions.Register("objective_item_pickup", {
 	filter = function(ent, ply) return ent:GetClass() == "bd_objective_item" end,
 	help = function(ent, ply) return "Pickup" end,
 	finish = function(ent, ply)

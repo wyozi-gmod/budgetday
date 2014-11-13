@@ -7,7 +7,7 @@ end
 function SKILL:UnRegisterVariables(ply)
 end
 
-bd.RegisterSkill("aisah_nightvision", SKILL)
+bd.skills.Register("aisah_nightvision", SKILL)
 
 if CLIENT then
 	-- CSS nightvision

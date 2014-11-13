@@ -7,4 +7,4 @@ end
 function SKILL:UnRegisterVariables(ply)
 end
 
-bd.RegisterSkill("aisah", SKILL)
+bd.skills.Register("aisah", SKILL)

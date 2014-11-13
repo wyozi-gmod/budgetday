@@ -1,13 +1,13 @@
-module("interactions", package.seeall)
+local MODULE = bd.module("interactions")
 
-Interactions = {}
+MODULE.Interactions = MODULE.Interactions or {}
 
-function Get(name)
-	return Interactions[name]
+function MODULE.Get(name)
+	return MODULE.Interactions[name]
 end
 
-function Register(name, tbl)
-	Interactions[name] = tbl
+function MODULE.Register(name, tbl)
+	MODULE.Interactions[name] = tbl
 end
 
 --[[interactions.Register("debug", {
@@ -18,7 +18,7 @@ end
 	length = function() return 5 end
 })]]
 
-interactions.Register("door_lockpick", {
+bd.interactions.Register("door_lockpick", {
 	filter = function(ent, ply)
 		return
 			ent:GetClass() == "prop_door_rotating" and
@@ -33,7 +33,7 @@ interactions.Register("door_lockpick", {
 	cancel = function(ent, ply) end,
 	length = function() return 5 end
 })
-interactions.Register("vent_breakin", {
+bd.interactions.Register("vent_breakin", {
 	filter = function(ent, ply)
 		return ent:GetClass() == "func_breakable"
 	end,
@@ -44,7 +44,7 @@ interactions.Register("vent_breakin", {
 	cancel = function(ent, ply) end,
 	length = function() return 5 end
 })
-interactions.Register("body_drag", {
+bd.interactions.Register("body_drag", {
 	filter = function(ent, ply)
 		return ent:GetClass() == "prop_ragdoll"
 	end,
@@ -64,7 +64,7 @@ interactions.Register("body_drag", {
 local entmeta = FindMetaTable("Entity")
 function entmeta:BD_GetValidInteractions(interacting_ply)
 	local ia = {}
-	for name,tbl in pairs(Interactions) do
+	for name,tbl in pairs(MODULE.Interactions) do
 		if tbl.filter(self, interacting_ply) then
 			table.insert(ia, name)
 		end
@@ -79,7 +79,7 @@ function plymeta:BD_GetInteraction()
 	return str
 end
 function plymeta:BD_GetInteractionMeta()
-	return Get(self:GetNWString("BD_InteractionName"))
+	return MODULE.Get(self:GetNWString("BD_InteractionName"))
 end
 function plymeta:BD_ClearInteraction()
 	self:SetNWString("BD_InteractionName", "")
@@ -112,7 +112,7 @@ if SERVER then
 		if ent:GetPos():Distance(ply:EyePos()) > max_dist then return ply:ChatPrint("too far") end
 
 		-- TODO verify distance to ent etc
-		local interaction = Get(ia_name)
+		local interaction = MODULE.Get(ia_name)
 		if not interaction then return ply:ChatPrint("Invalid interaction") end
 
 		if not interaction.filter(ent, ply) then return ply:ChatPrint("Invalid ent") end
@@ -227,7 +227,7 @@ if CLIENT then
 				end
 
 				if #ias == 1 then
-					text_rect(Get(ias[1]).help(tr.Entity, LocalPlayer()), _, "e")
+					text_rect(MODULE.Get(ias[1]).help(tr.Entity, LocalPlayer()), _, "e")
 				elseif #ias > 0 then
 					if iact_menu_ent == tr.Entity then
 						text_rect("Interactions", Color(100, 255, 100, 50))

@@ -36,7 +36,7 @@ function ENT:Think()
 	--debugoverlay.Line(cpos, cpos+cang:Forward()*100, 0.1)
 end
 
-interactions.Register("camera_mitm", {
+bd.interactions.Register("camera_mitm", {
 	filter = function(ent, ply) return ent:GetClass() == "bd_camera" end,
 	help = function(ent, ply) return "Bug camera signal" end,
 	finish = function(ent, ply)

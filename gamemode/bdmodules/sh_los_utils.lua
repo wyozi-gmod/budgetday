@@ -1,6 +1,6 @@
---Line of sight related utils
+local MODULE = bd.module("util")
 
-function bd.GetEntVector(obj, is_second_obj)
+function MODULE.GetEntPosition(obj, is_second_obj)
 	if type(obj) == "Vector" then return obj end
 
 	if obj.IsValid and IsValid(obj) then
@@ -23,9 +23,9 @@ function bd.GetEntVector(obj, is_second_obj)
 	ErrorNoHalt("Cant turn " .. tostring(obj) .. " into a vector")
 end
 
-function bd.ComputeLos(obj1, obj2)
-	local pos1 = bd.GetEntVector(obj1)
-	local pos2 = bd.GetEntVector(obj2, true)
+function MODULE.ComputeLos(obj1, obj2)
+	local pos1 = MODULE.GetEntPosition(obj1)
+	local pos2 = MODULE.GetEntPosition(obj2, true)
 
 	local tr = util.TraceLine {
 		start = pos1,
