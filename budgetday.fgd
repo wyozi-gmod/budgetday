@@ -35,9 +35,17 @@
 [
 	description(string) : "Description" : "" : "Description of this objective. Shown in tab menu. Should contain full instructions for how to complete this objective"
 
-	nextobjective(target_destination) : "Next objective" : "" : "The next main objective. Only used for informative purposes. To actually proceed to the next objective, use SetAsMainObjective on the next objective"
+	nextobjective(target_destination) : "Next Objective" : "" : "The next main objective. Only used for informative purposes. To actually proceed to the next objective, use SetAsMainObjective on the next objective"
+
+	highlightent(target_destination) : "Highlight Entity" : "" : "If a targetname is provided, highlights the target entity when this objective is active. The highlight is visible through walls"
+
+	overlaytext(string) : "Overlay Text" : "" : "Text that appears in location of this entity when this objective is active. \n\nThere are some replacements you can use: \n" +
+		"{objectiveitems} = Objective items picked\n" +
+		"{objectiveitemsreq} = Objective item requirement"
 
 	objectiveitems(integer) : "Objective Item Requirement" : 0 : "A helper function. If this amount of bd_objective_item entities that are linked to this objective are collected, the objective automatically ends. Set zero to disable."
+
+	input IncreaseObjectiveItemCount(void) : "Increases objective item count. Only useful if objective item requirement is set."
 
 	input SetAsMainObjective(void) : "Sets this objective as the current main objective"
 

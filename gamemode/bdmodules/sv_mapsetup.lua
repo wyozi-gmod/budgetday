@@ -103,23 +103,24 @@ local brain_generic = {
 		local check_ents = ents.FindByClass("bd_camera_monitor")
 
 		for _,ce in pairs(check_ents) do
-			if table.HasValue(checked_cameras, ce) then continue end
+			if not table.HasValue(checked_cameras, ce) then
 
-			local pos_diff = (ce:GetPos() - pos)
-			local pos_diff_normal = pos_diff:GetNormalized()
-			local dot = dir:Dot(pos_diff_normal)
-			local dist = pos_diff:Length()
+				local pos_diff = (ce:GetPos() - pos)
+				local pos_diff_normal = pos_diff:GetNormalized()
+				local dot = dir:Dot(pos_diff_normal)
+				local dist = pos_diff:Length()
 
-			local reqval = detection_ranges[spotter_ent:GetClass()] or detection_ranges.default
-			if dist < reqval.dist and dot > reqval.dot and bd.util.ComputeLos(spotter_ent, ce) then
-				local acam = ce:GetActiveCamera()
-				if IsValid(acam) and not table.HasValue(checked_cameras, acam) then
-					table.insert(checked_cameras, acam)
-					local cpos, cang = acam:GetCameraPosAng()
-					self:CheckForCameras(cpos, cang:Forward(), acam, callback, checked_cameras)
+				local reqval = detection_ranges[spotter_ent:GetClass()] or detection_ranges.default
+				if dist < reqval.dist and dot > reqval.dot and bd.util.ComputeLos(spotter_ent, ce) then
+					local acam = ce:GetActiveCamera()
+					if IsValid(acam) and not table.HasValue(checked_cameras, acam) then
+						table.insert(checked_cameras, acam)
+						local cpos, cang = acam:GetCameraPosAng()
+						self:CheckForCameras(cpos, cang:Forward(), acam, callback, checked_cameras)
+					end
 				end
 			end
-
+			
 		end
 	end,
 	SpotEntities = function(self, pos, dir, spot_callback, spotter_ent)

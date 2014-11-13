@@ -31,7 +31,9 @@ function ENT:InteractionFinished(ply)
 	self:TriggerOutput("OnFinishInteraction", ply)
 
 	if self:GetCarriedByPlayer() then
-		-- Carry
+		ply:PickupObject(self)
+		self:SetMoveType(MOVETYPE_VPHYSICS)
+		MsgN("PICKING UP ", self)
 	else
 		self:Remove()
 	end
