@@ -6,8 +6,8 @@ SWEP.SlotPos = 1
 
 SWEP.ViewModelFOV	= 58
 
-SWEP.ViewModel		= "models/weapons/v_binocular5.mdl"
-SWEP.WorldModel		= "models/weapons/w_binoculars.mdl"
+SWEP.ViewModel		= "models/props/de_tides/vending_hat.mdl"
+SWEP.WorldModel		= "models/props/de_tides/vending_hat.mdl"
 SWEP.HoldType			= "normal"
 
 SWEP.Primary.Delay = 2
@@ -43,6 +43,12 @@ end
 
 if CLIENT then
 
+	function SWEP:GetViewModelPosition( pos, ang )
+		pos = pos + ang:Forward() * 20 + ang:Up() * -6
+
+		ang:RotateAroundAxis(ang:Up(), -90)
+		return pos, ang
+	end 
 
 	function SWEP:GetWorldPos()
 		if not IsValid(self.Owner) then return end

@@ -30,8 +30,6 @@ function ENT:KeyValue( key, value )
 	elseif key == "OnEndObjective" then
 		self:StoreOutput(key, value)
 	end
-
-	MsgN("Objective ", key, " = ", value)
 end
 
 function ENT:AcceptInput(name, activator)
