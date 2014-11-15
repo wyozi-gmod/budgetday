@@ -237,9 +237,9 @@ if SERVER then
 		local pos = dmginfo:GetDamagePosition()
 
 		local hitgroup = 0
-		debugoverlay.Sphere(pos, 6, 1)
+		debugoverlay.Line(self:GetPos(), pos, 1)
 		if dmginfo:IsBulletDamage() then
-			self:NotifyDistraction({level = 1, pos = dmginfo:GetDamagePosition(), cause = "Was damaged"})
+			self:NotifyDistraction({level = 1, pos = pos, cause = "hurt"})
 		end
 	end
 

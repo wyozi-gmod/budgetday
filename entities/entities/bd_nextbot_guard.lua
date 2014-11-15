@@ -105,8 +105,12 @@ end
 
 function ENT:AlarmedMode(poi)
 	if not self.IsAlarmed then
-		self:PlaySequenceAndWait("drawpistol")
+		if poi then
+			self.loco:FaceTowards(poi.pos)
+		end
+
 		self:AddFakeWeapon("models/weapons/w_pist_glock18.mdl")
+		self:PlaySequenceAndWait("drawpistol")
 		--ent:PlaySequenceAndWait("Stand_to_crouchpistol")
 		--ent:SetSequence("Crouch_idle_pistol")
 		self.IsAlarmed = true
@@ -161,7 +165,7 @@ end
 
 function ENT:ComputeDistractionClusters()
 	if not self.DistractionHistory then return {} end
-	
+
 	local hist = self.DistractionHistory
 	hist = bd.util.FilterSeq(hist, function(v) return (CurTime() - v.happened) < 10 end)
 	hist = bd.util.Group(hist, function(v) return v.data.cause end)
@@ -198,7 +202,7 @@ function ENT:BehaviourTick()
 	end
 
 	if self:GetSuspicionLevel() >= 1 then
-		return self:AlarmedMode(data, self, poi)
+		return self:AlarmedMode(poi)
 	end
 	local spot_callback = function(data)
 		data.guard = self
