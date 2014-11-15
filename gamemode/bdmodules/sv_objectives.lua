@@ -1,8 +1,11 @@
 
 local function SetupObjectives()
 	if bd.MapSettings then
-		local objective_name = bd.MapSettings.FirstObjectiveName
-		SetGlobalEntity("Objective", ents.FindByName(objective_name)[1])
+		local stage_name = bd.MapSettings.FirstStageName
+		local stage = ents.FindByName(stage_name)[1]
+		if IsValid(stage) then
+			SetGlobalEntity("Objective", ents.FindByName(stage:GetFirstObjectiveName())[1])
+		end
 	end
 
 	if not IsValid(GetGlobalEntity("Objective")) then

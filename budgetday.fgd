@@ -28,7 +28,17 @@
 
 @PointClass base(Origin) = bd_mapsettings : "BD Map settings"
 [
-	firstobjective(target_destination) : "First Objective" : "" : "Should point to the bd_objective that starts the mission"
+	firststage(target_destination) : "First Stage" : "" : "Should point to the bd_mapstage that starts the mission"
+]
+
+@PointClass base(Targetname, Origin) = bd_mapstage : "BD Map stage"
+[
+	firstobjective(target_destination) : "First Objective" : "" : "Should point to the first main bd_objective of the stage"
+
+	input MissionAccomplished(void) : "Call to end the whole mission succesfully. Usually triggers a map vote or restart the current mission after a short delay."
+	input MissionFailed(string) : "Call to end the mission prematurely due to a failure. The string argument is the reason for the failure. The string is replaced with language specific equivalent, if it is one of the following: player_spotted, ragdoll_spotted, item_spotted"
+
+	output PoliceInformed(void) : "Fires when a guard or a citizen calls the police. You could for example start a timer here, and when timer expires start spawning a bunch of police NPCs in some good spots."
 ]
 
 @PointClass base(Targetname, Origin, Angles) = bd_objective : "An infonode for objectives"
