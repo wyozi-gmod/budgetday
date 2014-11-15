@@ -59,7 +59,7 @@ if CLIENT then
 	end
 
 	function MOD:Setup()
-	    self:RegisterInput(1, function()
+	    self:RegisterBind("impulse 100", "set nightvision level", function()
 	        LocalPlayer():BD_SetInt("nv_level", (LocalPlayer():BD_GetInt("nv_level", 0) + 1) % 4)
 	    end)
 	end
@@ -67,11 +67,10 @@ if CLIENT then
 	function MOD:HUDData(data)
 	    data.title = "Nightvision"
 	    data.state = LocalPlayer():BD_GetInt("nv_level", 0) > 0
-	    data.statekey = "(Shift + 1 to modify)"
-	    data.indicators = {
-	        {icon = icon_contrast, slider_frac = LocalPlayer():BD_GetInt("nv_level", 0)*0.33}
-	    }
+
+	    data.components:icon(icon_contrast)
+	    data.components:slider(LocalPlayer():BD_GetInt("nv_level", 0)*0.33)
 	end
 
-	bd.RegisterAISAHModule("nightvision", MOD)
+	bd.aisah.RegisterModule("nightvision", MOD)
 end

@@ -23,11 +23,13 @@ if CLIENT then
 
 	function MOD:HUDData(data)
 	    data.title = "Vital Statistics"
-	    data.indicators = {
-	        {icon = icon_heart, slider_frac = LocalPlayer():Health() / LocalPlayer():GetMaxHealth()},
-	        {icon = icon_sports, slider_frac = LocalPlayer():GetNWFloat("stamina")},
-	    }
+
+	    data.components:icon(icon_heart)
+	    data.components:slider(LocalPlayer():Health() / LocalPlayer():GetMaxHealth())
+
+	    data.components:icon(icon_sports)
+	    data.components:slider(LocalPlayer():GetNWFloat("stamina"))
 	end
 
-	bd.RegisterAISAHModule("vitalstats", MOD)
+	bd.aisah.RegisterModule("vitalstats", MOD)
 end

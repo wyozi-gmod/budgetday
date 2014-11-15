@@ -24,10 +24,10 @@ if CLIENT then
 
 	function MOD:HUDData(data)
 	    data.title = "Police Radio Analyzer"
-	    data.indicators = {
-	        {title = "Threat level", bars = {count = 0, max = 5}, text = "Low", textcolor = LerpColor(0, Color(255, 255, 255), Color(255, 0, 0))},
-	    }
+
+	    data.components:text("Thread level")
+	    data.components:bars(0, 5)
 	end
 
-	bd.RegisterAISAHModule("policeradio", MOD)
+	bd.aisah.RegisterModule("policeradio", MOD)
 end
