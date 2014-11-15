@@ -5,3 +5,7 @@ hook.Add("SetupMove", "BD_NerfMovement", function( ply, mv, cmd )
 		mv:SetButtons(bit.band(mv:GetButtons(), bit.bnot(IN_JUMP)))
 	end
 end)
+
+function GM:PlayerFootstep(ply, pos, foot, sound, volume, filter)
+	if ply:KeyDown(IN_DUCK) then return true end
+end

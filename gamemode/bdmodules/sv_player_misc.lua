@@ -22,11 +22,6 @@ function GM:OnPlayerHitGround(ply, in_water, on_floater, speed)
 		ply:EmitSound("physics/body/body_medium_impact_soft1.wav", _, _, math.Clamp(damage/100, 0, 1))
 	end
 end
-
-function GM:PlayerFootstep(ply, pos, foot, sound, volume, filter)
-	if ply:KeyDown(IN_DUCK) then return true end
-end
-
 local plymeta = FindMetaTable("Player")
 function plymeta:SetSprintEnabled(b)
 	if self.SprintEnabled == b then return end
