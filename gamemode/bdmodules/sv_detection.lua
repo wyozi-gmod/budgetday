@@ -37,7 +37,13 @@ hook.Add("EntityEmitSound", "BDDetectSounds", function(data)
 
 			suspicion = is_silenced and 0.1 or 1
 			cause = "Weapon shot"
-			pos = data.Entity:IsPlayer() and data.Entity:GetShootPos() or data.Entity:EyePosN()
+			if data.Entity:IsPlayer() then
+				pos = data.Entity:GetShootPos()
+			elseif data.Entity.EyePosN then
+				pos = data.Entity:EyePosN()
+			else
+				pos = data.Entity:GetPos()
+			end
 
 			-- Nonsilenced weapons are audible for really far away
 			if not is_silenced then falloff = 768 end

@@ -1,7 +1,7 @@
 AddCSLuaFile()
 
 ENT.Type = "anim"
-ENT.Model = Model("models/freeman/grapplinghook/scripthook.mdl")
+ENT.Model = Model("models/props_junk/meathook001a.mdl")
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Vector", 0, "HookedPos")

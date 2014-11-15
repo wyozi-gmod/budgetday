@@ -17,10 +17,10 @@ SWEP.Primary.ClipMax = 3
 SWEP.Primary.Ammo = "Grapp Hook"
 
 SWEP.UseHands			= true
-SWEP.ViewModelFlip		= false
-SWEP.ViewModelFOV		= 54
-SWEP.ViewModel			= "models/freeman/harpoongun.mdl"
-SWEP.WorldModel			= "models/freeman/harpoongun.mdl"
+SWEP.ViewModelFlip		= true
+SWEP.ViewModelFOV		= 80
+SWEP.ViewModel			= "models/weapons/v_snip_sg550.mdl"
+SWEP.WorldModel			= "models/weapons/w_snip_sg550.mdl"
 
 SWEP.Primary.Sound = Sound( "weapons/usp/usp1.wav" )
 SWEP.Primary.SoundLevel = 50
@@ -61,40 +61,4 @@ function SWEP:SecondaryAttack()
 		self.PhysRope:Remove()
 		self:SetNextPrimaryFire(CurTime() + 1)
 	end
-end
-
-if CLIENT then
-	function SWEP:GetWorldPos()
-		if not IsValid(self.Owner) then return end
-
-		local BoneIndx = self.Owner:LookupBone("ValveBiped.Bip01_R_Hand")
-	    local BonePos , BoneAng = self.Owner:GetBonePosition( BoneIndx )
-
-		local pos = BonePos
-		local ang = BoneAng
-
-		pos = pos + ang:Forward() * 21.5 + ang:Right() * 1.5
-
-		ang:RotateAroundAxis(ang:Forward(), 180)
-
-		return pos, ang
-	end
-
-	function SWEP:DrawWorldModel()
-		--if self.Owner == LocalPlayer() then return end -- We don't want two detonators in viewmodel. TODO breaks thirdperson (matters?)
-
-	    local pos, ang = self:GetWorldPos()
-	    if not pos or not ang then self:DrawModel() return end
-
-		self:SetRenderOrigin(pos)
-		self:SetRenderAngles(ang)
-		self:SetModelScale(1.2, 0)
-		self:SetupBones()
-		self:DrawModel()
-	end
-
-	function SWEP:GetViewModelPosition( pos, ang )
-		pos = pos + ang:Up() * -4 + ang:Forward() * 25 + ang:Right() * 5
-		return pos, ang
-	end 
 end
