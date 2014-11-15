@@ -3,19 +3,18 @@ AddCSLuaFile()
 ENT.Base 			= "base_nextbot"
 ENT.Spawnable		= true
 
-function ENT:SetupDataTables()
-end
+ENT.Model = Model("models/Kleiner.mdl")
 
-function ENT:GetDistractionLevel()
-	return self:GetNWFloat("Detection", 0) or 0
+function ENT:GetSuspicionLevel()
+	return self:GetNWFloat("Suspicion", 0) or 0
 end
-function ENT:SetDistractionLevel(lvl)
-	return self:SetNWFloat("Detection", lvl)
+function ENT:SetSuspicionLevel(lvl)
+	return self:SetNWFloat("Suspicion", lvl)
 end
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel("models/Police.mdl")
+		self:SetModel(self.Model)
 
 		self:SetHealth(100)
 	end
@@ -155,39 +154,16 @@ if SERVER then
 		return "ok"
 	end
 
-	function ENT:SetBrain(brain)
-		self.Brain = brain
-		self.BrainData = {}
-
-		if self.Brain.Initialize then
-			self.Brain.Initialize(self.Brain, self.BrainData, self)
-		end
-	end
-
-	function ENT:RunBehaviorTick()
-		local brain = self.Brain
-		local braindata = self.BrainData
-
-		if not brain then
-			self:StartActivity(ACT_IDLE)
-		else
-			local nextthink = braindata.NextThink
-			if not nextthink or nextthink <= CurTime() then
-				local nt = brain.Think(brain, braindata, self)
-				braindata.NextThink = nt
-			end
-		end
-		--[[
-		self.loco:SetAcceleration(100)
-		self:MoveToPos(player.GetByID(1):GetPos(), {draw = true})
-		self:SetEyeAngles((player.GetByID(1):EyePos() - self:EyePosN()):Angle())
-		]]
+	-- This is the method you need to override
+	function ENT:BehaviourTick()
+		self:StartActivity(ACT_IDLE)
 	end
 
 	function ENT:RunBehaviour()
-
 		while ( true ) do
-			local stat, err = pcall(function() self:RunBehaviorTick() end)
+			local stat, err = pcall(function() self:BehaviourTick() end)
+
+			if not stat then MsgN("NextBot error: ", err) end
 
 			coroutine.yield()
 		end
@@ -207,7 +183,7 @@ if SERVER then
 	end
 
 	function ENT:NotifyDistraction(data)
-		self:SetDistractionLevel(self:GetDistractionLevel() + data.level)
+		self:SetSuspicionLevel(self:GetSuspicionLevel() + data.level)
 
 		self.DistractionHistory = self.DistractionHistory or {}
 		
@@ -216,7 +192,7 @@ if SERVER then
 			data = data
 		})
 
-		MsgN(self, " distraction: ", math.Round(data.level, 3) , " to ", self:GetDistractionLevel(), " caused by ", data.cause)
+		hook.Call("BDNextbotDistraction", GAMEMODE, self, data)
 	end
 
 	-- Once again some nice code from TTT..

@@ -6,8 +6,8 @@ surface.CreateFont("BDDetectionFont", {
 })
 
 hook.Add("PostDrawOpaqueRenderables", "BDDrawDetectionStatus", function()
-	for _,guard in pairs(ents.FindByClass("bd_ai_base")) do
-		local det = guard:GetNWFloat("Detection")
+	for _,guard in pairs(ents.FindByClass("bd_nextbot*")) do
+		local det = guard:GetNWFloat("Suspicion")
 		local lastdet = guard.LastDetection
 
 		local pos = (guard:GetPos() + Vector(0, 0, 95))
