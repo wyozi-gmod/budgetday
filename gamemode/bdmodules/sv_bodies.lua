@@ -1,5 +1,6 @@
 function bd.DragBody(ply, body, bone)
 	ply.BD_DragData = {body=body, bone=bone}
+	body:SetNWBool("BeingDragged", true)
 end
 
 -- Some code from Murder..
@@ -15,6 +16,7 @@ hook.Add("Think", "BDHandleBodyDrag", function()
 				local len = vec:Length()
 				if len > 40 or not ply:KeyDown(IN_DUCK) then
 					ply.BD_DragData = nil
+					dd.body:SetNWBool("BeingDragged", false)
 					return
 				end
 				vec:Normalize()

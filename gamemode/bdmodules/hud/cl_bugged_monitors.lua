@@ -16,14 +16,14 @@ local function GetMonitorObjects(monitor, callback)
 	callback(acam, Color(127, 255, 0))
 
 	for _,ce in pairs(check_ents) do
-		local targpos = bd.GetEntVector(ce)
+		local targpos = bd.util.GetEntPosition(ce)
 
 		local pos_diff = (targpos - pos)
 		local pos_diff_normal = pos_diff:GetNormalized()
 		local dot = dir:Dot(pos_diff_normal)
 		local dist = pos_diff:Length()
 
-		local is_los_clear = bd.ComputeLos(pos, ce)
+		local is_los_clear = bd.util.ComputeLos(pos, ce)
 
 		local reqval = {dist=768, dot=0.65}
 
@@ -59,7 +59,7 @@ hook.Add("PostDrawOpaqueRenderables", "BDDrawObjectsThroughBuggedCameras", funct
     	obj.ent:DrawModel()
 
     	if IsValid(obj.mon) then
-    		render.DrawLine(bd.GetEntVector(obj.mon), bd.GetEntVector(obj.ent), obj.clr or Color(255, 127, 0), false)
+    		render.DrawLine(bd.util.GetEntPosition(obj.mon), bd.util.GetEntPosition(obj.ent), obj.clr or Color(255, 127, 0), false)
     	end
     end
 
