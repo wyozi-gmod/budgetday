@@ -1,3 +1,4 @@
+--- Adds line-of-sight check related functions to "util" module
 local MODULE = bd.module("util")
 
 function MODULE.GetEntPosition(obj, is_second_obj)

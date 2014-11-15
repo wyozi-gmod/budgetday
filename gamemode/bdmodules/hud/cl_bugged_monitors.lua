@@ -1,3 +1,6 @@
+--- Handles highlighting bugged security camera monitors on screen.
+-- A security camera monitor is bugged, if it has a NWBool "Bugged" with value "true".
+
 local function GetMonitorObjects(monitor, callback)
 	local acam = monitor:GetActiveCamera()
 	if not IsValid(acam) then return end

@@ -1,3 +1,5 @@
+--- Handles drawing exclamation/question marks, that signify their suspicion level, on top of guards' heads.
+
 surface.CreateFont("BDDetectionFont", {
 	font = "Roboto",
 	size = 120
