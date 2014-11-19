@@ -12,6 +12,18 @@ ENT.WalkActivity = ACT_WALK
 --- The activity to use for running
 ENT.RunActivity = ACT_RUN
 
+ENT.StartingHealth = 100
+ENT.StartingArmor = {
+	[HITGROUP_HEAD] = 0,
+	[HITGROUP_CHEST] = 20,
+	[HITGROUP_STOMACH] = 10,
+	[HITGROUP_LEFTARM] = 5,
+	[HITGROUP_RIGHTARM] = 5,
+	[HITGROUP_LEFTLEG] = 5,
+	[HITGROUP_RIGHTLEG] = 5,
+	[HITGROUP_GEAR] = 0, --?
+}
+
 --- NextBot line of sight.
 -- The line of sight forms a cone, where the apex is NextBot's head.
 ENT.Sight = {
@@ -170,7 +182,8 @@ function ENT:Initialize()
 	if SERVER then
 		self:SetModel(self.Model)
 
-		self:SetHealth(100)
+		self:SetHealth(self.StartingHealth)
+		self.Armor = table.Copy(self.StartingArmor)
 	end
 end
 
@@ -181,222 +194,220 @@ function ENT:EyePosN()
 	return headpos
 end
 
-if SERVER then
-	function ENT:AddFlashlight()
+function ENT:AddFlashlight()
+	local shootpos = self:GetAttachment(self:LookupAttachment("anim_attachment_LH"))
+
+	local wep = ents.Create("bd_lamp")
+	wep:SetModel(Model("models/maxofs2d/lamp_flashlight.mdl"))
+	wep:SetOwner(self)
+
+	wep:SetFlashlightTexture("effects/flashlight/soft")
+	wep:SetColor(Color(255, 255, 255))
+	wep:SetDistance(512)
+	wep:SetBrightness(1)
+	wep:SetLightFOV(80)
+    wep:Switch(true)
+
+    wep:Spawn()
+
+    wep:SetModelScale(0.5, 0)
+
+    wep:SetSolid(SOLID_NONE)
+    wep:SetParent(self)
+
+    wep:Fire("setparentattachment", "anim_attachment_LH")
+
+    self.Flashlight = wep
+end
+
+
+-- Weapon handling code modified version of
+--  https://github.com/PresidentMattDamon/onslaughtgmod/blob/master/entities/entities/snpc_police/shared.lua
+
+hook.Add("PlayerCanPickupWeapon", "BD.DontPickupNextbotWeapon", function(ply, ent)
+	return not ent.DontPickUp
+end)
+
+function ENT:GiveWeapon(weaponcls)
+	if not IsValid(self) then return end
+	if self.Weapon then self.Weapon:Remove() end
+	local att = "anim_attachment_RH"
+
+	local shootpos = self:GetAttachment(self:LookupAttachment(att))
+	local wep = ents.Create(weaponcls)
+
+	wep:SetOwner(self)
+	wep:SetPos(shootpos.Pos)
+	wep:Spawn()
+
+	wep.DontPickUp = true
+	wep:SetSolid(SOLID_NONE)
+	wep:SetParent(self)
+
+	wep:Fire("setparentattachment", att)
+	wep:AddEffects(EF_BONEMERGE)
+	wep:SetAngles(self:GetForward():Angle())
+
+	self.Weapon = wep
+
+	-- If we had a flashlight, we remove that and attach a flashlight to our weapon
+	if IsValid(self.Flashlight) then
+		self.Flashlight:Remove()
+
+		-- TODO attach flashlight to the weapon
+	end
+end
+
+function ENT:GetActiveWeapon()
+	return self.Weapon
+end
+
+function ENT:ShootWeapon()
+
+end
+
+function ENT:BehaveAct()
+
+end
+function ENT:MoveToPos( pos, options )
+	local options = options or {}
+
+	local path = Path( "Follow" )
+	path:SetMinLookAheadDistance( options.lookahead or 300 )
+	path:SetGoalTolerance( options.tolerance or 20 )
+	path:Compute( self, pos )
+
+	if ( not path:IsValid() ) then return "failed" end
+
+	while ( path:IsValid() ) do
+		if options.terminate_condition and options.terminate_condition() then
+			return "terminated"
+		end
+
+		path:Update( self )
+
+		-- Draw the path (only visible on listen servers or single player)
+		if ( options.draw ) then
+			path:Draw()
+		end
+
+		-- If we're stuck then call the HandleStuck function and abandon
+		if ( self.loco:IsStuck() ) then
+			self:HandleStuck()
+			return "stuck"
+		end
+
+		--
+		-- If they set maxage on options then make sure the path is younger than it
+		--
+		if ( options.maxage ) then
+			if ( path:GetAge() > options.maxage ) then return "timeout" end
+		end
+
+		--
+		-- If they set repath then rebuild the path every x seconds
+		--
+		if ( options.repath ) then
+			if ( path:GetAge() > options.repath ) then
+				local newpos = (options.repath_pos and options.repath_pos() or pos)
+				path:Compute( self, newpos )
+			end
+		end
+
+		coroutine.yield()
+	end
+	return "ok"
+end
+
+-- This is the method you need to override
+function ENT:BehaviourTick()
+	self:StartActivity(ACT_IDLE)
+end
+
+function ENT:RunBehaviour()
+	while ( true ) do
+		local stat, err = pcall(function() self:BehaviourTick() end)
+
+		if not stat then MsgN("NextBot error: ", err) end
+
+		coroutine.yield()
+	end
+end
+
+function ENT:Think()
+	if IsValid(self.Flashlight) then
 		local shootpos = self:GetAttachment(self:LookupAttachment("anim_attachment_LH"))
-
-		local wep = ents.Create("bd_lamp")
-		wep:SetModel(Model("models/maxofs2d/lamp_flashlight.mdl"))
-		wep:SetOwner(self)
-
-		wep:SetFlashlightTexture("effects/flashlight/soft")
-		wep:SetColor(Color(255, 255, 255))
-		wep:SetDistance(512)
-		wep:SetBrightness(1)
-		wep:SetLightFOV(80)
-	    wep:Switch(true)
-
-	    wep:Spawn()
-
-	    wep:SetModelScale(0.5, 0)
-
-	    wep:SetSolid(SOLID_NONE)
-	    wep:SetParent(self)
-
-	    wep:Fire("setparentattachment", "anim_attachment_LH")
-
-	    self.Flashlight = wep
+		local pos, ang = shootpos.Pos, shootpos.Ang
+		ang:RotateAroundAxis(ang:Right(), 180)
+		self.Flashlight:SetAngles(ang)
 	end
+end
 
+function ENT:UpdateTransmitState()
+	return TRANSMIT_ALWAYS
+end
 
-	-- Weapon handling code modified version of
-	--  https://github.com/PresidentMattDamon/onslaughtgmod/blob/master/entities/entities/snpc_police/shared.lua
+function ENT:NotifyDistraction(data)
+	self:SetSuspicionLevel(self:GetSuspicionLevel() + data.level)
 
-	hook.Add("PlayerCanPickupWeapon", "BD.DontPickupNextbotWeapon", function(ply, ent)
-		return not ent.DontPickUp
-	end)
+	self.DistractionHistory = self.DistractionHistory or {}
 
-	function ENT:GiveWeapon(weaponcls)
-		if !IsValid(self) then return end
-		if self.Weapon then self.Weapon:Remove() end
-		local att = "anim_attachment_RH"
+	table.insert(self.DistractionHistory, {
+		happened = CurTime(),
+		data = data
+	})
 
-		local shootpos = self:GetAttachment(self:LookupAttachment(att))
-		local wep = ents.Create(weaponcls)
+	hook.Call("BDNextbotDistraction", GAMEMODE, self, data)
+end
 
-		wep:SetOwner(self)
-		wep:SetPos(shootpos.Pos)
-		wep:Spawn()
+-- Once again some nice code from TTT..
+function ENT:BecomePhysicalRagdoll(dmginfo)
 
-		wep.DontPickUp = true
-		wep:SetSolid(SOLID_NONE)
-		wep:SetParent(self)
+	local rag = ents.Create("prop_ragdoll")
+	if not IsValid(rag) then return nil end
 
-		wep:Fire("setparentattachment", att)
-		wep:AddEffects(EF_BONEMERGE)
-		wep:SetAngles(self:GetForward():Angle())
+	rag:SetPos(self:GetPos())
+	rag:SetModel(self:GetModel())
+	rag:SetAngles(self:GetAngles())
+	rag:Spawn()
+	rag:Activate()
 
-		self.Weapon = wep
+	-- nonsolid to players, but can be picked up and shot
+	rag:SetCollisionGroup(COLLISION_GROUP_WEAPON)
 
-		-- If we had a flashlight, we remove that and attach a flashlight to our weapon
-		if IsValid(self.Flashlight) then
-			self.Flashlight:Remove()
-
-			-- TODO attach flashlight to the weapon
-		end
+	-- position the bones
+	local num = rag:GetPhysicsObjectCount()-1
+	local v = self:GetVelocity()
+	-- bullets have a lot of force, which feels better when shooting props,
+	-- but makes bodies fly, so dampen that here
+	if dmginfo:IsDamageType(DMG_BULLET) or dmginfo:IsDamageType(DMG_SLASH) then
+		v = v / 5
 	end
-
-	function ENT:GetActiveWeapon()
-		return self.Weapon
-	end
-
-	function ENT:ShootWeapon()
-
-	end
-
-	function ENT:BehaveAct()
-
-	end
-	function ENT:MoveToPos( pos, options )
-		local options = options or {}
-
-		local path = Path( "Follow" )
-		path:SetMinLookAheadDistance( options.lookahead or 300 )
-		path:SetGoalTolerance( options.tolerance or 20 )
-		path:Compute( self, pos )
-
-		if ( !path:IsValid() ) then return "failed" end
-
-		while ( path:IsValid() ) do
-			if options.terminate_condition and options.terminate_condition() then
-				return "terminated"
+	for i=0, num do
+		local bone = rag:GetPhysicsObjectNum(i)
+		if IsValid(bone) then
+			local bp, ba = self:GetBonePosition(rag:TranslatePhysBoneToBone(i))
+			if bp and ba then
+				bone:SetPos(bp)
+				bone:SetAngles(ba)
 			end
-
-			path:Update( self )
-
-			-- Draw the path (only visible on listen servers or single player)
-			if ( options.draw ) then
-				path:Draw()
-			end
-
-			-- If we're stuck then call the HandleStuck function and abandon
-			if ( self.loco:IsStuck() ) then
-				self:HandleStuck()
-				return "stuck"
-			end
-
-			--
-			-- If they set maxage on options then make sure the path is younger than it
-			--
-			if ( options.maxage ) then
-				if ( path:GetAge() > options.maxage ) then return "timeout" end
-			end
-
-			--
-			-- If they set repath then rebuild the path every x seconds
-			--
-			if ( options.repath ) then
-				if ( path:GetAge() > options.repath ) then
-					local newpos = (options.repath_pos and options.repath_pos() or pos)
-					path:Compute( self, newpos )
-				end
-			end
-
-			coroutine.yield()
-		end
-		return "ok"
-	end
-
-	-- This is the method you need to override
-	function ENT:BehaviourTick()
-		self:StartActivity(ACT_IDLE)
-	end
-
-	function ENT:RunBehaviour()
-		while ( true ) do
-			local stat, err = pcall(function() self:BehaviourTick() end)
-
-			if not stat then MsgN("NextBot error: ", err) end
-
-			coroutine.yield()
+			-- not sure if this will work:
+			bone:SetVelocity(v)
 		end
 	end
 
-	function ENT:Think()
-		if IsValid(self.Flashlight) then
-			local shootpos = self:GetAttachment(self:LookupAttachment("anim_attachment_LH"))
-			local pos, ang = shootpos.Pos, shootpos.Ang
-			ang:RotateAroundAxis(ang:Right(), 180)
-			self.Flashlight:SetAngles(ang)
-		end
+end
+
+function ENT:OnInjured(dmginfo)
+	local pos = dmginfo:GetDamagePosition()
+
+	local hitgroup = 0
+	if dmginfo:IsBulletDamage() then
+		self:NotifyDistraction({level = 1, pos = pos, cause = "hurt"})
 	end
+end
 
-	function ENT:UpdateTransmitState()
-		return TRANSMIT_ALWAYS
-	end
-
-	function ENT:NotifyDistraction(data)
-		self:SetSuspicionLevel(self:GetSuspicionLevel() + data.level)
-
-		self.DistractionHistory = self.DistractionHistory or {}
-
-		table.insert(self.DistractionHistory, {
-			happened = CurTime(),
-			data = data
-		})
-
-		hook.Call("BDNextbotDistraction", GAMEMODE, self, data)
-	end
-
-	-- Once again some nice code from TTT..
-	function ENT:BecomePhysicalRagdoll(dmginfo)
-
-		local rag = ents.Create("prop_ragdoll")
-		if not IsValid(rag) then return nil end
-
-		rag:SetPos(self:GetPos())
-		rag:SetModel(self:GetModel())
-		rag:SetAngles(self:GetAngles())
-		rag:Spawn()
-		rag:Activate()
-
-		-- nonsolid to players, but can be picked up and shot
-		rag:SetCollisionGroup(COLLISION_GROUP_WEAPON)
-
-		-- position the bones
-		local num = rag:GetPhysicsObjectCount()-1
-		local v = self:GetVelocity()
-		-- bullets have a lot of force, which feels better when shooting props,
-		-- but makes bodies fly, so dampen that here
-		if dmginfo:IsDamageType(DMG_BULLET) or dmginfo:IsDamageType(DMG_SLASH) then
-			v = v / 5
-		end
-		for i=0, num do
-			local bone = rag:GetPhysicsObjectNum(i)
-			if IsValid(bone) then
-				local bp, ba = self:GetBonePosition(rag:TranslatePhysBoneToBone(i))
-				if bp and ba then
-					bone:SetPos(bp)
-					bone:SetAngles(ba)
-				end
-				-- not sure if this will work:
-				bone:SetVelocity(v)
-			end
-		end
-
-	end
-
-	function ENT:OnInjured(dmginfo)
-		local pos = dmginfo:GetDamagePosition()
-
-		local hitgroup = 0
-		if dmginfo:IsBulletDamage() then
-			self:NotifyDistraction({level = 1, pos = pos, cause = "hurt"})
-		end
-	end
-
-	function ENT:OnKilled( dmginfo )
-		self:BecomePhysicalRagdoll( dmginfo )
-		self:Remove()
-	end
+function ENT:OnKilled( dmginfo )
+	self:BecomePhysicalRagdoll( dmginfo )
+	self:Remove()
 end

@@ -3,6 +3,7 @@ local debug_dist = CreateConVar("bd_debug_distractions", "0")
 local debug_distclusters = CreateConVar("bd_debug_distractionclusters", "0")
 local debug_sight = CreateConVar("bd_debug_sight", "0")
 local debug_losents = CreateConVar("bd_debug_losentities", "0")
+local debug_cameras = CreateConVar("bd_debug_cameras", "0")
 
 hook.Add("BDNextbotDistraction", "BD.DebugDistractions", function(nextbot, data)
 	if not debug_dist:GetBool() then return end
@@ -85,6 +86,19 @@ hook.Add("Think", "BD.DebugLOSEntities", function()
 			else
 				debugoverlay.Line(bd.util.GetEntPosition(ent), bd.util.GetEntPosition(sent.ent), 0.2, Color(127, 255, 0))
 			end
+		end
+	end
+end)
+
+hook.Add("Think", "BD.DebugCameras", function()
+	if not debug_cameras:GetBool() then return end
+
+	for _,ent in pairs(ents.FindByClass("bd_camera_monitor")) do
+
+		local acam = ent:GetActiveCamera()
+		if IsValid(acam) then
+			local clr = HSVToColor(ent:EntIndex() * 10, 0.5, 1)
+			debugoverlay.Line(ent:GetPos(), acam:GetPos(), 0.1, clr, true)
 		end
 	end
 end)
