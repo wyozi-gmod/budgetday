@@ -3,6 +3,16 @@ AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Model = Model("models/props/cs_assault/camera.mdl")
 
+--- NextBot line of sight.
+-- See entities/entities/bd_nextbotbase.lua
+ENT.Sight = {
+	distance = 768,
+	angle = 40,
+
+	ent_pos = function(ent) return select(1, ent:GetCameraPosAng()) end,
+	ent_dir = function(ent) return select(2, ent:GetCameraPosAng()):Forward() end
+}
+
 function ENT:SetupDataTables()
 	self:NetworkVar("String", 0, "CameraName", {KeyName = "cameraname"})
 end
@@ -16,7 +26,7 @@ end
 function ENT:Initialize()
 	if SERVER then
 		self:SetModel(self.Model)
-		
+
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_NONE)
 		self:SetSolid(SOLID_VPHYSICS)

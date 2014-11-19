@@ -10,6 +10,12 @@ function MODULE.Map(tbl, fn)
 	return t
 end
 
+function MODULE.Find(tbl, fn)
+	for k,v in pairs(tbl) do
+		if fn(v, k) then return v end
+	end
+end
+
 -- Filter for sequential tables
 function MODULE.FilterSeq(tbl, fn)
 	local t = {}

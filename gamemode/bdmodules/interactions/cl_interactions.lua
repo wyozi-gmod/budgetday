@@ -18,14 +18,14 @@ hook.Add("PlayerBindPress", "BD_HandleInteraction", function(ply, bind, pressed)
 					net.WriteEntity(tr.Entity)
 					net.WriteString(ia_name)
 				net.SendToServer()
-				
+
 				iact_menu_ent = nil
 				return true
 			end
 		end
 	end
 	if bind == "+use" and pressed and tr.Entity ~= iact_menu_ent then
-		if IsValid(tr.Entity) then
+		if IsValid(tr.Entity) and tr.Entity:GetPos():Distance(LocalPlayer():EyePos()) <= MODULE.MaxInteractDistance then
 			local ias = tr.Entity:BD_GetValidInteractions(LocalPlayer())
 
 			if #ias == 1 then
@@ -33,7 +33,7 @@ hook.Add("PlayerBindPress", "BD_HandleInteraction", function(ply, bind, pressed)
 					net.WriteEntity(tr.Entity)
 					net.WriteString(ias[1])
 				net.SendToServer()
-				
+
 				return true
 			elseif #ias > 0 then
 				iact_menu_ent = tr.Entity

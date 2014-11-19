@@ -36,7 +36,7 @@ hook.Add("Think", "BD_HandleAISAHInput", function()
 
 	local inputstr = table.concat(keys, " ")
 
-	local mod = bd.FindModule(function(mod)
+	local mod = bd.aisah.FindModule(function(mod)
 		return mod.RegisteredInputs and mod.RegisteredInputs[inputstr] and mod:Has(LocalPlayer())
 	end)
 	if mod then
@@ -49,7 +49,7 @@ hook.Add("PlayerBindPress", "BD_AISAH", function(ply, bind, pressed)
 	if not LocalPlayer():BD_GetBool("wear_aisah") then return end
 
 	if pressed then
-		local mod = bd.FindModule(function(mod)
+		local mod = bd.aisah.FindModule(function(mod)
 			return mod.RegisteredBindInputs and mod.RegisteredBindInputs[bind] and mod:Has(LocalPlayer())
 		end)
 		if mod then

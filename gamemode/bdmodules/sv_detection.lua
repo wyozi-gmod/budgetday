@@ -1,6 +1,6 @@
 hook.Add("BDGuardSpotted", "BDRaiseGuardSuspicion", function(data)
-	local guard = data.guard
 	local ent = data.ent
+	local guard = data.original_spotter
 
 	local base_incr
 	local cause = "spotted_unknown"
@@ -14,10 +14,10 @@ hook.Add("BDGuardSpotted", "BDRaiseGuardSuspicion", function(data)
 	end
 
 	if base_incr then
-		local dist_mul = math.Clamp(1 / (data.dist / 128), 0, 1)
+		local dist_mul = math.Clamp(1 / (data.distance / 128), 0, 1)
 		local incr = base_incr * dist_mul
 
-		guard:NotifyDistraction({level = incr, pos = ent:GetPos(), spotter_ent = data.spotter_ent, cause = cause})
+		guard:NotifyDistraction({level = incr, pos = ent:GetPos(), spotter_ent = data.spotter, cause = cause})
 	end
 
 end)

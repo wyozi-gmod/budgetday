@@ -3,7 +3,161 @@ AddCSLuaFile()
 ENT.Base 			= "base_nextbot"
 ENT.Spawnable		= true
 
+-- NextBot related variables
 ENT.Model = Model("models/Kleiner.mdl")
+
+--- The activity to use for walking
+ENT.WalkActivity = ACT_WALK
+
+--- The activity to use for running
+ENT.RunActivity = ACT_RUN
+
+--- NextBot line of sight.
+-- The line of sight forms a cone, where the apex is NextBot's head.
+ENT.Sight = {
+	distance = 768,
+	angle = 60
+}
+
+--- Calls 'callback' parameter with ALL entities found inside the cone that can be constructed from parameters.
+-- This method is also known as "this is what happens when you have to re-code Source engine functions that
+-- are supposed to work"
+function ENT:SpotEntities(pos, dir, sight_data, callback, ent)
+	local required_dot = math.cos(math.rad(sight_data.angle))
+
+	-- Okay, so ents.FindInCone is basically the most useless function in all Garry's Mod
+	-- I don't even know what it does, but it definitely does not find entities in a cone
+	-- (see https://github.com/Facepunch/garrysmod-issues/issues/1271)
+	--
+	-- A workaround:
+	-- We turn the cone into an AABB, get all the entities inside it using the relatively fast
+	-- ents.FindInBox function and only then do more sophisticated "isInsideCone" checks using
+	-- dot product
+
+	local dir_right = dir:Cross(Vector(0, 0, 1))
+	local dir_up = dir_right:Cross(dir)
+
+	--debugoverlay.Line(pos, pos+dir*100, 0.2, Color(255, 0, 0))
+	--debugoverlay.Line(pos, pos+dir_right*100, 0.2, Color(0, 255, 0))
+	--debugoverlay.Line(pos, pos+dir_up*100, 0.2, Color(0, 0, 255))
+
+	local cone_radius = math.tan(math.rad(sight_data.angle)) * sight_data.distance
+
+	-- I am terrible at math so this is the best I could come up with to turn a cone into an AABB
+	-- Basically it approximates points in the base of the cone and keeps expanding box_mins and box_maxs
+	-- to fit all of them inside it. This is not the most efficient way to do it (TODO?), but is pretty simple.
+
+	local box_mins = Vector(9999999, 9999999, 9999999)
+	local box_maxs = Vector(-9999999, -9999999, -9999999)
+
+	local function CheckMinMax(v)
+		box_mins.x = math.min(box_mins.x, v.x)
+		box_mins.y = math.min(box_mins.y, v.y)
+		box_mins.z = math.min(box_mins.z, v.z)
+
+		box_maxs.x = math.max(box_maxs.x, v.x)
+		box_maxs.y = math.max(box_maxs.y, v.y)
+		box_maxs.z = math.max(box_maxs.z, v.z)
+	end
+
+	CheckMinMax(pos)
+
+	local points = 16
+	local rad_per_point = math.pi*2 / points
+	for i=0,points do
+		local endpos = pos + dir * sight_data.distance
+		+ dir_right * math.cos(rad_per_point * i) * cone_radius
+		+ dir_up * math.sin(rad_per_point * i) * cone_radius
+
+		CheckMinMax(endpos)
+	end
+
+	--debugoverlay.Box(pos, box_mins-pos, box_maxs-pos, 0.2, Color(255, 255, 255, 1), false)
+
+	for _,ent in pairs(ents.FindInBox(box_mins, box_maxs)) do
+		if not ent:IsWorld() then
+			local pos_diff = (bd.util.GetEntPosition(ent) - pos)
+			local pos_diff_normal = pos_diff:GetNormalized()
+			local dot = dir:Dot(pos_diff_normal)
+			local dist = pos_diff:Length()
+
+			if bd.util.ComputeLos(pos, ent) and dot >= required_dot and dist <= sight_data.distance then
+				callback(ent)
+			end
+		end
+	end
+end
+
+--- Returns a table containing entities that the NextBot is able to see.
+-- Uses values from ENT.Sight to determine sight.
+--
+-- Also returns entities spotted in camera monitors etc
+function ENT:ComputeLOSEntities(opts)
+	local spotted_ents = {}
+
+	-- Adds entity to the table that is returned from this method
+	local function AddEntity(ent, data)
+		if (opts and opts.filter and not opts.filter(ent, data)) then
+			-- If entity has SightLink, it is only filtered if opts.filter_sightlinks is set
+			if not ent.SightLink or (opts and opts.filter_sightlinks) then
+				if opts and opts.debug then
+					MsgN("[NextBot-Sight] Filtering out ", ent)
+				end
+				return
+			end
+		end
+		if bd.util.Find(spotted_ents, function(tbl) return tbl.ent == ent end) then
+			if opts and opts.debug then
+				MsgN("[NextBot-Sight] Filtering out ", ent, " because it is already in spotted_ents")
+			end
+			return
+		end
+
+		table.insert(spotted_ents, {
+			ent = ent,
+			spotter = data.spotter
+		})
+	end
+
+	local eyepos = self:EyePosN()
+	local eyedir = self:GetAngles():Forward()
+
+	-- First we list the entities that this NextBot is able to see
+	self:SpotEntities(eyepos, eyedir, self.Sight, function(ent)
+		AddEntity(ent, {spotter = self})
+	end, self)
+
+	-- Then we filter through entities and get the ones that have a SightLink variable
+	local linked_ents = bd.util.FilterSeq(spotted_ents, function(tbl)
+		return tbl.ent.SightLink ~= nil
+	end)
+
+	if opts and opts.debug then
+		MsgN("[NextBot-Sight] Linked ents: ", table.ToString(linked_ents))
+	end
+
+	for _,linked in pairs(linked_ents) do
+		-- Get the entities (eg. security cameras) we should check vision of
+		local linked_vision_sources = linked.ent.SightLink.GetLinkedEntities(linked.ent, eyepos, eyedir)
+
+		-- Go through vision source tables
+		for _,source in pairs(linked_vision_sources or {}) do
+			local ent = source.ent
+
+			if not IsValid(ent) then
+				ErrorNoHalt(string.format("Linked vision source for entity '%s' has invalid entity", linked.ent:GetClass()))
+			elseif not ent.Sight then
+				ErrorNoHalt(string.format("Linked vision source '%s' has no 'Sight'", ent:GetClass()))
+			else
+				self:SpotEntities(source.pos, source.ang:Forward(), ent.Sight, function(spotted_ent)
+					AddEntity(spotted_ent, {spotter = ent})
+				end, ent)
+			end
+		end
+	end
+
+	return spotted_ents
+end
 
 function ENT:GetSuspicionLevel()
 	return self:GetNWFloat("Suspicion", 0) or 0
@@ -27,26 +181,6 @@ function ENT:EyePosN()
 	return headpos
 end
 
-function ENT:IsPointOnSight(p)
-	--http://stackoverflow.com/questions/12826117/how-can-i-detect-if-a-point-is-inside-of-a-cone-or-not-in-3d-space
-
-	local cone_tip = self:EyePosN()
-	local cone_dir = self:EyeAngles():Forward()
-	local cone_height = 1024
-
-	local cone_base_radius = 512
-
-	local p_tip_diff = p - cone_tip
-
-	local cone_dist = p_tip_diff:Dot(cone_dir)
-	if cone_dist < 0 or cone_dist > cone_height then return false end
-
-	local cone_radius_at_point = (cone_dist / cone_height) * cone_base_radius
-	local orth_dist =  (p_tip_diff - cone_dist * cone_dir):Length()
-
-	return orth_dist < cone_radius_at_point
-end
-
 if SERVER then
 	function ENT:AddFlashlight()
 		local shootpos = self:GetAttachment(self:LookupAttachment("anim_attachment_LH"))
@@ -65,7 +199,7 @@ if SERVER then
 	    wep:Spawn()
 
 	    wep:SetModelScale(0.5, 0)
-	    
+
 	    wep:SetSolid(SOLID_NONE)
 	    wep:SetParent(self)
 
@@ -74,31 +208,50 @@ if SERVER then
 	    self.Flashlight = wep
 	end
 
-	function ENT:AddFakeWeapon(model)
-		local shootpos = self:GetAttachment(self:LookupAttachment("anim_attachment_RH"))
 
-		local wep = ents.Create("prop_physics")
-		wep:SetModel(model)
+	-- Weapon handling code modified version of
+	--  https://github.com/PresidentMattDamon/onslaughtgmod/blob/master/entities/entities/snpc_police/shared.lua
+
+	hook.Add("PlayerCanPickupWeapon", "BD.DontPickupNextbotWeapon", function(ply, ent)
+		return not ent.DontPickUp
+	end)
+
+	function ENT:GiveWeapon(weaponcls)
+		if !IsValid(self) then return end
+		if self.Weapon then self.Weapon:Remove() end
+		local att = "anim_attachment_RH"
+
+		local shootpos = self:GetAttachment(self:LookupAttachment(att))
+		local wep = ents.Create(weaponcls)
+
 		wep:SetOwner(self)
 		wep:SetPos(shootpos.Pos)
-	    --wep:SetAngles(ang)
-	    wep:Spawn()
-	    
-	    wep:SetSolid(SOLID_NONE)
-	    wep:SetParent(self)
+		wep:Spawn()
 
-	    wep:Fire("setparentattachment", "anim_attachment_RH")
-	    wep:AddEffects(EF_BONEMERGE)
-	    wep:SetAngles(self:GetForward():Angle())
+		wep.DontPickUp = true
+		wep:SetSolid(SOLID_NONE)
+		wep:SetParent(self)
 
-	    self.PhysWeapon = wep
+		wep:Fire("setparentattachment", att)
+		wep:AddEffects(EF_BONEMERGE)
+		wep:SetAngles(self:GetForward():Angle())
 
-	    -- If we had a flashlight, we remove that and attach a flashlight to our weapon
-	    if IsValid(self.Flashlight) then
-	    	self.Flashlight:Remove()
+		self.Weapon = wep
 
-	    	-- TODO attach flashlight
-	    end
+		-- If we had a flashlight, we remove that and attach a flashlight to our weapon
+		if IsValid(self.Flashlight) then
+			self.Flashlight:Remove()
+
+			-- TODO attach flashlight to the weapon
+		end
+	end
+
+	function ENT:GetActiveWeapon()
+		return self.Weapon
+	end
+
+	function ENT:ShootWeapon()
+
 	end
 
 	function ENT:BehaveAct()
@@ -186,7 +339,7 @@ if SERVER then
 		self:SetSuspicionLevel(self:GetSuspicionLevel() + data.level)
 
 		self.DistractionHistory = self.DistractionHistory or {}
-		
+
 		table.insert(self.DistractionHistory, {
 			happened = CurTime(),
 			data = data
@@ -237,7 +390,6 @@ if SERVER then
 		local pos = dmginfo:GetDamagePosition()
 
 		local hitgroup = 0
-		debugoverlay.Line(self:GetPos(), pos, 1)
 		if dmginfo:IsBulletDamage() then
 			self:NotifyDistraction({level = 1, pos = pos, cause = "hurt"})
 		end

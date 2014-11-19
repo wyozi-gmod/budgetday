@@ -4,76 +4,25 @@ ENT.Base = "bd_nextbotbase"
 
 ENT.Model = Model("models/Police.mdl")
 
-local detection_ranges = {
-	["bd_camera"] = {dist = 768, dot = 0.65},
-	["bd_nextbot_guard"] = {dist = 768, dot = 0.5},
-	default = {dist = 512, dot = 0.5}
-}
-
-function ENT:CheckForCameras(pos, dir, spotter_ent, callback, checked_cameras)
-	checked_cameras = checked_cameras or {}
-
-	callback(pos, dir, spotter_ent)
-
-	local check_ents = ents.FindByClass("bd_camera_monitor")
-
-	for _,ce in pairs(check_ents) do
-		if not table.HasValue(checked_cameras, ce) then
-
-			local pos_diff = (ce:GetPos() - pos)
-			local pos_diff_normal = pos_diff:GetNormalized()
-			local dot = dir:Dot(pos_diff_normal)
-			local dist = pos_diff:Length()
-
-			local reqval = detection_ranges[spotter_ent:GetClass()] or detection_ranges.default
-			if dist < reqval.dist and dot > reqval.dot and bd.util.ComputeLos(spotter_ent, ce) then
-				local acam = ce:GetActiveCamera()
-				if IsValid(acam) and not table.HasValue(checked_cameras, acam) then
-					table.insert(checked_cameras, acam)
-					local cpos, cang = acam:GetCameraPosAng()
-					self:CheckForCameras(cpos, cang:Forward(), acam, callback, checked_cameras)
-				end
-			end
+function ENT:UpdateSightSuspicion(callback)
+	local los_ents = self:ComputeLOSEntities({
+		filter = function(ent)
+			return ent:IsPlayer() or
+					ent:GetClass() == "prop_ragdoll" or
+					ent:GetClass():StartWith("bd_nextbot*")
 		end
-		
+	})
+
+	for _,data in pairs(los_ents) do
+		data.original_spotter = self
+
+		-- Compute some useful variables that are bound to be computed at some point anyway
+		data.distance = bd.util.GetEntPosition(data.original_spotter):Distance(bd.util.GetEntPosition(data.ent))
+
+		hook.Call("BDGuardSpotted", GAMEMODE, data)
+
+		if callback then callback(data) end
 	end
-end
-function ENT:SpotEntities(pos, dir, spot_callback, spotter_ent)
-	local check_ents = {}
-	table.Add(check_ents, player.GetAll())
-	table.Add(check_ents, ents.FindByClass("prop_ragdoll"))
-
-	for _,ce in pairs(check_ents) do
-		local targpos = ce:GetPos()
-		if ce:IsPlayer() then
-			targpos = ce:EyePos()
-		end
-
-		local pos_diff = (targpos - pos)
-		local pos_diff_normal = pos_diff:GetNormalized()
-		local dot = dir:Dot(pos_diff_normal)
-		local dist = pos_diff:Length()
-
-		local is_los_clear = bd.util.ComputeLos(spotter_ent, ce)
-
-		local reqval = detection_ranges[spotter_ent:GetClass()] or detection_ranges.default
-
-		if dist < reqval.dist and dot > reqval.dot and is_los_clear then
-			spot_callback({
-				ent = ce,
-				spotter_ent = spotter_ent,
-				pos = pos,
-				targpos = targpos,
-				dot = dot,
-				dist = dist
-			})
-		end
-	end
-end
-function ENT:SpotPosition(spot_callback)
-	self:CheckForCameras(self:GetPos() + Vector(0,0,60), self:GetAngles():Forward(), self, function(pos, dir, spotter_ent)
-		self:SpotEntities(pos, dir, spot_callback, spotter_ent)
-	end)
 end
 
 function ENT:StartMovingTo(move_data)
@@ -91,7 +40,7 @@ function ENT:StartMovingTo(move_data)
 	self:MoveToPos(move_data.pos, {
 		terminate_condition = function()
 			if move_data.spot_callback then
-				self:SpotPosition(move_data.spot_callback)
+				self:UpdateSightSuspicion()
 				if self:GetSuspicionLevel() >= 1 then
 					return true
 				end
@@ -109,7 +58,7 @@ function ENT:AlarmedMode(poi)
 			self.loco:FaceTowards(poi.pos)
 		end
 
-		self:AddFakeWeapon("models/weapons/w_pist_glock18.mdl")
+		self:GiveWeapon("weapon_bd_usp")
 		self:PlaySequenceAndWait("drawpistol")
 		--ent:PlaySequenceAndWait("Stand_to_crouchpistol")
 		--ent:SetSequence("Crouch_idle_pistol")
@@ -117,7 +66,7 @@ function ENT:AlarmedMode(poi)
 	end
 
 	local shoot_targ
-	self:SpotPosition(function(data)
+	self:UpdateSightSuspicion(function(data)
 		if data.ent:IsPlayer() then shoot_targ = data.ent end
 	end)
 
@@ -137,13 +86,13 @@ function ENT:AlarmedMode(poi)
 			bullet.Dir 	= ang:Forward()
 			bullet.Src 	= pos
 			bullet.Spread 	= Vector( 0.1, 0.1, 0 )	 -- Aim Cone
-			bullet.Tracer	= 1 -- Show a tracer on every x bullets 
+			bullet.Tracer	= 1 -- Show a tracer on every x bullets
 			bullet.Force	= 1 -- Amount of force to give to phys objects
 			bullet.Damage	= 25
 			bullet.AmmoType = "Pistol"
 
 			--debugoverlay.Line(bullet.Src, bullet.Src + bullet.Dir * 100, 2)
-			
+
 			self:FireBullets( bullet )
 			self:EmitSound(Sound( "Weapon_Glock.Single" ))
 
@@ -204,12 +153,8 @@ function ENT:BehaviourTick()
 	if self:GetSuspicionLevel() >= 1 then
 		return self:AlarmedMode(poi)
 	end
-	local spot_callback = function(data)
-		data.guard = self
-		hook.Call("BDGuardSpotted", GAMEMODE, data)
-	end
 
-	self:SpotPosition(spot_callback)
+	self:UpdateSightSuspicion()
 
 	if self.NPCType == "roaming" and (not self.NextRoam or self.NextRoam < CurTime()) then
 		self:StartMovingTo {

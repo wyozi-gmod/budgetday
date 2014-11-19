@@ -9,12 +9,16 @@
 -- @realm client
 local MODULE = bd.module("aisah")
 
---- This is the metatable that every single AISAH module is based on. Adding functions to it makes them available in the module as well.
-MODULE.Meta = {}
+--- This is the metatable that every single AISAH module is based on.
+-- Adding functions to it makes them available in the module as well.
+MODULE.Meta = {} 
 MODULE.Meta.__index = MODULE.Meta
 
 MODULE.AISAHModules = {}
 
+--- Registers and sets up module. After registering module is eligible for drawing and input.
+-- @param name:string the internal name of this module
+-- @param module:table the actual module
 function MODULE.RegisterModule(name, mod)
 	setmetatable(mod, MODULE.Meta)
 	MODULE.AISAHModules[name] = mod
@@ -22,7 +26,10 @@ function MODULE.RegisterModule(name, mod)
 	mod:Setup()
 end
 
-function bd.FindModule(filter)
+--- Executes given 'filter' function once for each registered AISAH module.
+-- If 'filter' returns true, returns that module immediately.
+-- @param filter:function the callback function
+function MODULE.FindModule(filter)
 	for _,mod in pairs(MODULE.AISAHModules) do
 		if filter(mod) then return mod end
 	end

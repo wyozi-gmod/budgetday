@@ -1,10 +1,5 @@
-local debug_bools = {
-	visionrange = false
-}
-
-hook.Add("Think", "BDHighlightSight", function()
-	if not debug_bools.visionrange then return end
-
+hook.Add("Think", "BD.DebugSight", function()
+	--[[
 	local ent = {}
 	table.Add(ent, ents.FindByClass("bd_camera"))
 	table.Add(ent, ents.FindByClass("bd_nextbot*"))
@@ -31,4 +26,5 @@ hook.Add("Think", "BDHighlightSight", function()
 									ang:Up()*math.sin(rad_per_point*i)*radius, 0.1, Color(100, 255, 100))
 		end
 	end
+	]]
 end)

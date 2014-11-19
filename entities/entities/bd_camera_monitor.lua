@@ -3,6 +3,23 @@ AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Model = Model("models/props/cs_office/computer_monitor.mdl")
 
+--- This entity can be used as "extended vision" for NextBots.
+-- In practise this means that the positions returned from SightLink's
+-- GetVisionSource are used in NextBot's SpotLOSEntities method
+--
+-- See http://i.imgur.com/yjHz0n9.png
+ENT.SightLink = {
+	GetLinkedEntities = function(ent, nextbot_eyepos, nextbot_eyedir)
+		local acam = ent:GetActiveCamera()
+		if IsValid(acam) then
+			local pos, ang = acam:GetCameraPosAng()
+			return {
+				{ent = acam, pos = pos, ang = ang}
+			}
+		end
+	end
+}
+
 function ENT:SetupDataTables()
 	self:NetworkVar("Entity", 0, "ActiveCamera")
 	self:NetworkVar("Int", 0, "CameraOffset", {KeyName = "cameraoffset"})
@@ -17,7 +34,7 @@ end
 function ENT:Initialize()
 	if SERVER then
 		self:SetModel(self.Model)
-		
+
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetSolid(SOLID_VPHYSICS)
