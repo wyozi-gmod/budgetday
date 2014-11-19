@@ -39,11 +39,10 @@ function ENT:StartMovingTo(move_data)
 
 	self:MoveToPos(move_data.pos, {
 		terminate_condition = function()
-			if move_data.spot_callback then
-				self:UpdateSightSuspicion()
-				if self:GetSuspicionLevel() >= 1 then
-					return true
-				end
+			self:UpdateSightSuspicion()
+			
+			if self:GetSuspicionLevel() >= 1 then
+				return true
 			end
 			return false
 		end,
