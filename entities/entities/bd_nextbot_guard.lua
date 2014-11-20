@@ -126,7 +126,7 @@ function ENT:AlarmedMode(poi)
 
 			self.NextShoot = CurTime() + math.random(0.3, 0.6)
 		end
-	elseif poi and poi.spotted_directly then
+	elseif poi and poi.spotted_directly and poi.pos then
 		self.loco:FaceTowards(poi.pos)
 	end
 
@@ -164,7 +164,7 @@ function ENT:ComputeDistractionClusters()
 		end
 
 		if t.pos then t.pos = t.pos / datacount end
-		
+
 		t.cause = cause
 
 		-- If spotter is not nil, all tables in 'data' had the same spotter
