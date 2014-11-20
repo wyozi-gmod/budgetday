@@ -126,7 +126,7 @@ function ENT:AlarmedMode(poi)
 
 			self.NextShoot = CurTime() + math.random(0.3, 0.6)
 		end
-	elseif poi then
+	elseif poi and poi.spotted_directly then
 		self.loco:FaceTowards(poi.pos)
 	end
 
@@ -146,12 +146,22 @@ function ENT:ComputeDistractionClusters()
 	for cause, data in pairs(hist) do
 		local t = {pos = Vector(0, 0, 0), level = 0}
 
+		local spotter
+
 		for _,d in pairs(data) do
 			t.pos = t.pos + d.data.pos
 			t.level = t.level + d.data.level
+
+			if spotter == nil then spotter = d.data.spotter_ent end
+			if spotter and spotter ~= d.data.spotter_ent then spotter = false end
 		end
 
 		t.pos = t.pos / #data
+		t.cause = cause
+
+		-- If spotter is not nil, all tables in 'data' had the same spotter
+		-- if spotter is false, they had differing spotters
+		if spotter then t.spotter = spotter end
 
 		flattened[cause] = t
 	end
@@ -166,7 +176,10 @@ function ENT:BehaviourTick()
 
 		for groupname,group in pairs(clusters) do
 			if group.level > 0 and (not poi or group.level > poi.level) then
-				poi = {pos = group.pos, level = group.level}
+				poi = {pos = group.pos, level = group.level, spotter = group.spotter, cause = group.cause}
+
+				-- Did we see whatever happened with our own eyes
+				poi.spotted_directly = not poi.spotter or poi.spotter:GetClass() ~= "bd_camera"
 			end
 		end
 	end
@@ -187,7 +200,7 @@ function ENT:BehaviourTick()
 		self.NextRoam = CurTime() + math.random(2, 15)
 	end
 
-	if poi and poi.level >= 0.25 then
+	if poi and poi.level >= 0.25 and poi.spotted_directly then
 		self.loco:FaceTowards(poi.pos)
 	end
 
