@@ -75,7 +75,7 @@ function ENT:AlarmedMode(poi)
 		self:EmitSound("npc/combine_soldier/vo/heavyresistance.wav")
 		coroutine.wait(1.5 + math.random(0.1, 1.5))
 
-		-- TODO this is the part where police is officially informed
+		bd.policeraid.Start()
 
 		self:SetNWFloat("CallingForHelp", 0)
 
