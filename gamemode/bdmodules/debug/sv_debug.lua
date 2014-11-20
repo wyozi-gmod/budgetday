@@ -17,7 +17,7 @@ hook.Add("BDNextbotDistraction", "BD.DebugDistractions", function(nextbot, data)
 		debugoverlay.Line(bd.util.GetEntPosition(data.spotter_ent), data.pos, duration, Color(255, 127, 0))
 	else
 		debugoverlay.Line(bd.util.GetEntPosition(nextbot), data.pos, duration)
-		debugoverlay.Text((bd.util.GetEntPosition(nextbot) + data.pos)/2, string.format("%s (+%.4f)", data.cause, data.level), duration)
+		debugoverlay.Text((bd.util.GetEntPosition(nextbot) + data.pos)/2, string.format("%s (+%.4f) %s", data.cause, data.level, table.ToString(data.debug_data or {})), duration)
 	end
 
 	MsgN(nextbot, " distraction: ", math.Round(data.level, 3) , " to ", nextbot:GetSuspicionLevel(), " caused by ", data.cause)

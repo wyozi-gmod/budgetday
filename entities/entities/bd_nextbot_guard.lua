@@ -186,8 +186,13 @@ function ENT:BehaviourTick()
 			if group.level > 0 and (not poi or group.level > poi.level) then
 				poi = {pos = group.pos, level = group.level, spotter = group.spotter, cause = group.cause}
 
-				-- Did we see whatever happened with our own eyes
-				poi.spotted_directly = not poi.spotter or poi.spotter:GetClass() ~= "bd_camera"
+				-- Is the POI caused by something we saw with our own ears or heard nearby
+				poi.spotted_directly = (poi.cause:StartWith("spotted_") and
+											(not poi.spotter or
+												poi.spotter:GetClass() ~= "bd_camera")) or
+									   (poi.cause:StartWith("heard_") and
+											poi.pos and
+											poi.pos:Distance(self:GetPos()) < 512)
 			end
 		end
 	end
