@@ -27,7 +27,7 @@ if CLIENT then
 	    else
 	    	render.SetColorModulation(0, 1, 0)
 	    end
-	    cam.IgnoreZ(true)
+	    cam.IgnoreZ(false)
 	    render.SuppressEngineLighting(true)
 
 	    ent:DrawModel()
@@ -36,9 +36,11 @@ if CLIENT then
 	    cam.IgnoreZ(false)
 	    render.SetColorModulation(1, 1, 1)
 
-	    cam.Start2D()
-	    local ts = (ent:LocalToWorld(ent:OBBCenter()) + Vector(0, 0, -10)):ToScreen()
-	    draw.SimpleText(is_recording and "Recording" or "Not recording", "DermaDefaultBold", ts.x, ts.y, _, TEXT_ALIGN_CENTER)
-	    cam.End2D()
+		local ang = LocalPlayer():EyeAngles()
+		ang:RotateAroundAxis(ang:Forward(), 90)
+		ang:RotateAroundAxis(ang:Right(), 90)
+		cam.Start3D2D((ent:LocalToWorld(ent:OBBCenter()) + Vector(0, 0, -10)), Angle(0, ang.y, 90), 0.3)
+			draw.DrawText(is_recording and "Recording" or "Not recording", "DermaDefaultBold", 0, 0, Color(255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		cam.End3D2D()
 	end)
 end
