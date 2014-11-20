@@ -3,6 +3,7 @@ local soundfile_detection = {
         match = function(soundname) return soundname:find("footstep") end,
 
         suspicion = 0.02,
+        falloff_exp = 1.5,
         cause = "heard_footstep"
     },
     {

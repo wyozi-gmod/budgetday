@@ -17,7 +17,7 @@ function ENT:UpdateSightSuspicion(callback)
 		data.original_spotter = self
 
 		-- Compute some useful variables that are bound to be computed at some point anyway
-		data.distance = bd.util.GetEntPosition(data.original_spotter):Distance(bd.util.GetEntPosition(data.ent))
+		data.distance = bd.util.GetEntPosition(data.spotter):Distance(bd.util.GetEntPosition(data.ent))
 
 		hook.Call("BDGuardSpotted", GAMEMODE, data)
 

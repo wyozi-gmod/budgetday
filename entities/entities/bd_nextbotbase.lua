@@ -395,6 +395,8 @@ function ENT:UpdateTransmitState()
 end
 
 function ENT:NotifyDistraction(data)
+	local olds = self:GetSuspicionLevel()
+
 	self:SetSuspicionLevel(self:GetSuspicionLevel() + data.level)
 
 	self.DistractionHistory = self.DistractionHistory or {}
@@ -403,6 +405,10 @@ function ENT:NotifyDistraction(data)
 		happened = CurTime(),
 		data = data
 	})
+
+	if self:GetSuspicionLevel() >= 1 and olds < 1 then
+		BroadcastLua([[chat.AddText('You got spotted by ]] .. tostring(self) .. [[. Reason: ]] .. data.cause .. [[')]])
+	end
 
 	hook.Call("BDNextbotDistraction", GAMEMODE, self, data)
 end
