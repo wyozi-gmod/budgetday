@@ -460,7 +460,7 @@ function ENT:OnInjured(dmginfo)
 		if bone then
 			local bonepos, boneang = self:GetBonePosition(bone)
 
-			table.insert(dist_to_hitgroups, {hitgroup = hitgroup, dist = pos:Distance(bonepos)})
+			table.insert(dist_to_hitgroups, {bonename = self:GetBoneName(bone), hitgroup = hitgroup, dist = pos:Distance(bonepos)})
 		end
 	end
 
