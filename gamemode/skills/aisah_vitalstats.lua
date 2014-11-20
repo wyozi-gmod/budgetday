@@ -24,10 +24,10 @@ if CLIENT then
 	function MOD:HUDData(data)
 	    data.title = "Vital Statistics"
 
-	    data.components:icon(icon_heart)
+	    data.components:text("Health: ")
 	    data.components:slider(LocalPlayer():Health() / LocalPlayer():GetMaxHealth())
 
-	    data.components:icon(icon_sports)
+	    data.components:text("Stamina: ")
 	    data.components:slider(LocalPlayer():GetNWFloat("stamina"))
 	end
 

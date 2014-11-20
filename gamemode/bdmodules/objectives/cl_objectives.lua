@@ -1,4 +1,6 @@
 hook.Add("HUDPaint", "BDDrawObjective", function()
+	if true then return end
+	
 	local obj = GetGlobalEntity("Objective")
 
 	draw.SimpleText(IsValid(obj) and obj:GetDescription() or "No Objective", "DermaLarge", ScrW()/2, ScrH()-200, Color(255, 255, 255), TEXT_ALIGN_CENTER)
@@ -8,6 +10,26 @@ hook.Add("HUDPaint", "BDDrawObjective", function()
 		draw.SimpleText(IsValid(sec_obj) and sec_obj:GetDescription() or "No Secondary Objective", "DermaDefaultBold", ScrW()/2, ScrH()-185 + i*25, Color(200, 200, 200), TEXT_ALIGN_CENTER)
 	end
 end)
+
+-- We create an AISAH module to display objectives
+
+local MOD = {}
+
+function MOD:Has(ply)
+	return true
+end
+
+function MOD:Setup()
+end
+
+function MOD:HUDData(data)
+	data.title = "Current Objective"
+
+	local obj = GetGlobalEntity("Objective")
+	data.components:text(IsValid(obj) and obj:GetDescription() or "No Objective")
+end
+
+bd.aisah.RegisterModule("objectives", MOD)
 
 hook.Add("PostDrawOpaqueRenderables", "BDHighlightObjectives", function()
 	local ply = LocalPlayer()

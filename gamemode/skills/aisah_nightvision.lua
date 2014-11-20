@@ -68,7 +68,7 @@ if CLIENT then
 	    data.title = "Nightvision"
 	    data.state = LocalPlayer():BD_GetInt("nv_level", 0) > 0
 
-	    data.components:icon(icon_contrast)
+	    data.components:text("Strength: ")
 	    data.components:slider(LocalPlayer():BD_GetInt("nv_level", 0)*0.33)
 	end
 

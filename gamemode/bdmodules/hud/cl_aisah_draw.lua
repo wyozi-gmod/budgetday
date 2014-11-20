@@ -1,13 +1,27 @@
 local MODULE = bd.module("aisah")
 
+surface.CreateFont("BD_AISAH_Header", {
+	font = "Consolas",
+	size = 22,
+	weight = 800
+})
+surface.CreateFont("BD_AISAH_Text", {
+	font = "Roboto",
+	size = 17
+})
+surface.CreateFont("BD_AISAH_Help", {
+	font = "Trebuchet MS",
+	size = 18
+})
+
 local hud_colors = {
 	default = Color(200, 200, 200, 160),
 	info = Color(200, 200, 200, 120),
 
 	bar = Color(255, 255, 0),
 
-	state_on = Color(0, 170, 0, 120),
-	state_off = Color(170, 0, 0, 120)
+	state_on = Color(30, 130, 76, 255),
+	state_off = Color(217, 30, 24, 120)
 }
 
 function MODULE.Meta:DrawComponent(data)
@@ -25,7 +39,7 @@ function MODULE.Meta:DrawComponent(data)
 	surface.SetDrawColor(80, 80, 80, 15)
 	surface.DrawRect(x+4, y, w-4, h)
 
-	local tw, th = draw.SimpleText(data.title, "Trebuchet24", x + 10, y+13, hud_colors.default, _, TEXT_ALIGN_CENTER)
+	local tw, th = draw.SimpleText(data.title, "BD_AISAH_Header", x + 10, y+13, hud_colors.default, _, TEXT_ALIGN_CENTER)
 
 	local helpstr = ""
 
@@ -35,7 +49,7 @@ function MODULE.Meta:DrawComponent(data)
 		end
 	end
 
-	draw.SimpleText(helpstr, "Trebuchet18", x + w - 10, y+13+1, hud_colors.info, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+	draw.SimpleText(helpstr, "BD_AISAH_Help", x + w - 6, y+12, hud_colors.info, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
 
 	local ind_x = x + 10
 	local ind_y = y + 28
@@ -44,7 +58,7 @@ function MODULE.Meta:DrawComponent(data)
 		local ind = data.components[i]
 
 		if ind.type == "text" then
-			local tw, th = draw.SimpleText(ind.text, "Trebuchet18", ind_x, ind_y, hud_colors.info)
+			local tw, th = draw.SimpleText(ind.text, "BD_AISAH_Text", ind_x, ind_y, hud_colors.info)
 			ind_x = ind_x + tw + 5
 		elseif ind.type == "icon" then
 			surface.SetDrawColor(255, 255, 255)
