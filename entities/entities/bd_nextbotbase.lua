@@ -101,15 +101,15 @@ function ENT:SpotEntities(pos, dir, sight_data, callback, ent)
 
 	--debugoverlay.Box(pos, box_mins-pos, box_maxs-pos, 0.2, Color(255, 255, 255, 1), false)
 
-	for _,ent in pairs(ents.FindInBox(box_mins, box_maxs)) do
-		if not ent:IsWorld() then
-			local pos_diff = (bd.util.GetEntPosition(ent) - pos)
+	for _,boxent in pairs(ents.FindInBox(box_mins, box_maxs)) do
+		if not boxent:IsWorld() then
+			local pos_diff = (bd.util.GetEntPosition(boxent) - pos)
 			local pos_diff_normal = pos_diff:GetNormalized()
 			local dot = dir:Dot(pos_diff_normal)
 			local dist = pos_diff:Length()
 
-			if bd.util.ComputeLos(pos, ent) and dot >= required_dot and dist <= sight_data.distance then
-				callback(ent)
+			if bd.util.ComputeLos(ent, boxent) and dot >= required_dot and dist <= sight_data.distance then
+				callback(boxent)
 			end
 		end
 	end

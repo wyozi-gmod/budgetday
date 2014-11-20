@@ -16,7 +16,7 @@ function MODULE.Start()
         -- TODO make it a method?
         nb.HasCalledForHelp = true
 
-        nb:NotifyDistraction({level = 1, pos = nb:GetPos(), cause = "policeraid_start"})
+        nb:NotifyDistraction({level = 1, cause = "policeraid_start"})
     end
 
 end

@@ -17,27 +17,53 @@ function MODULE.GetEntPosition(obj, is_second_obj)
 			if obj.WorldSpaceCenter then return obj:WorldSpaceCenter() end
 			if obj.OBBCenter then return obj:LocalToWorld(obj:OBBCenter()) end
 		end
-		
+
 		return obj:GetPos()
 	end
 
 	ErrorNoHalt("Cant turn " .. tostring(obj) .. " into a vector")
 end
 
-function MODULE.ComputeLos(obj1, obj2)
+-- ComputeLos is gonna be called from a single thread, so these are some nice optimizations
+--  to prevent A LOT of memory allocation
+local tr_output = {}
+
+local tr_input = {}
+tr_input.output = tr_output
+tr_input.filter = function(ent)
+	if ent:IsWeapon() then return true end
+
+	return not (ent == tr_input.obj1 or ent == tr_input.obj2)
+end
+
+local function bor(...)
+	local v = 0
+	for _,v2 in pairs{...} do
+		v = bit.bor(v, v2)
+	end
+	return v
+end
+local mask = bor(CONTENTS_SOLID, CONTENTS_MOVEABLE, CONTENTS_OPAQUE, CONTENTS_BLOCKLOS, CONTENTS_MONSTER)
+
+function MODULE.ComputeLos(obj1, obj2, debug)
 	local pos1 = MODULE.GetEntPosition(obj1)
 	local pos2 = MODULE.GetEntPosition(obj2, true)
 
-	local tr = util.TraceLine {
-		start = pos1,
-		endpos = pos2,
-		filter = function(ent) return not (ent == obj1 or ent == obj2) end,
-		mask = MASK_OPAQUE + CONTENTS_IGNORE_NODRAW_OPAQUE
-	}
+	tr_input.start = pos1
+	tr_input.endpos = pos2
 
-	local res = not tr.Hit
+	tr_input.obj1 = obj1
+	tr_input.obj2 = obj2
 
-	--debugoverlay.Line(pos1, pos2, 0.1, Color(0, res and 255 or 0, 0))
+	tr_input.mask = mask
 
-	return res
+	util.TraceLine(tr_input)
+
+	local res = not tr_output.Hit
+
+	if debug then
+		debugoverlay.Line(pos1, pos2, 0.1, Color(0, res and 255 or 0, 0))
+	end
+
+	return res, tr_output.Entity
 end

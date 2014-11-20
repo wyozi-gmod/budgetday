@@ -144,19 +144,27 @@ function ENT:ComputeDistractionClusters()
 
 	local flattened = {}
 	for cause, data in pairs(hist) do
-		local t = {pos = Vector(0, 0, 0), level = 0}
+		local t = {level = 0}
 
 		local spotter
 
+		local datacount = 0
 		for _,d in pairs(data) do
-			t.pos = t.pos + d.data.pos
+			if d.data.pos then
+				if not t.pos then t.pos = Vector(0, 0, 0) end
+
+				t.pos = t.pos + d.data.pos
+				datacount = datacount+1
+			end
+
 			t.level = t.level + d.data.level
 
 			if spotter == nil then spotter = d.data.spotter_ent end
 			if spotter and spotter ~= d.data.spotter_ent then spotter = false end
 		end
 
-		t.pos = t.pos / #data
+		if t.pos then t.pos = t.pos / datacount end
+		
 		t.cause = cause
 
 		-- If spotter is not nil, all tables in 'data' had the same spotter
