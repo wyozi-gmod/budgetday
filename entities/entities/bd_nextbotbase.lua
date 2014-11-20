@@ -6,6 +6,21 @@ ENT.Spawnable		= true
 -- NextBot related variables
 ENT.Model = Model("models/Kleiner.mdl")
 
+-- This is where things get dirty. NextBots have no concept of "hitgroups" like players and npcs do
+-- That is why we have to use hitboxes and dmginfo:GetDamagePosition() to approximate the hitgroup.
+--
+-- This table should contain mappings from hitbox IDs to HITGROUP enums.
+-- To keep things simple, it is assumed that hitbox group 0 is the correct group.
+ENT.HitBoxToHitGroup = {
+	[0] = HITGROUP_HEAD,
+	[16] = HITGROUP_CHEST,
+	[15] = HITGROUP_STOMACH,
+	[5] = HITGROUP_RIGHTARM,
+	[2] = HITGROUP_LEFTARM,
+	[12] = HITGROUP_RIGHTLEG,
+	[8] = HITGROUP_LEFTLEG
+}
+
 --- The activity to use for walking
 ENT.WalkActivity = ACT_WALK
 
@@ -431,9 +446,30 @@ function ENT:BecomePhysicalRagdoll(dmginfo)
 end
 
 function ENT:OnInjured(dmginfo)
-	local pos = dmginfo:GetDamagePosition()
+	-- There is no good way to figure out hitgroups in nextbots.
+	-- The hacky way we're going to do it is get hitbox bones, then get distance from
+	--  the position the nextbot was shot at to the position of the bone, then return
+	--  the hitgroup that has lowest distance. Not perfect but works
 
+	local pos = dmginfo:GetDamagePosition()
 	local hitgroup = 0
+
+	local dist_to_hitgroups = {}
+	for hitbox,hitgroup in pairs(self.HitBoxToHitGroup) do
+		local bone = self:GetHitBoxBone(hitbox, 0)
+		if bone then
+			local bonepos, boneang = self:GetBonePosition(bone)
+
+			table.insert(dist_to_hitgroups, {hitgroup = hitgroup, dist = pos:Distance(bonepos)})
+		end
+	end
+
+	table.SortByMember(dist_to_hitgroups, "dist", true)
+
+	hitgroup = dist_to_hitgroups[1].hitgroup
+
+	hook.Call("BDScaleNextbotDamage", GAMEMODE, self, hitgroup, dmginfo)
+
 	if dmginfo:IsBulletDamage() then
 		self:NotifyDistraction({level = 1, pos = pos, cause = "hurt"})
 	end

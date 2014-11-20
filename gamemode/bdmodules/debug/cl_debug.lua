@@ -15,7 +15,7 @@ hook.Add("Think", "BD.DebugNextBotHitboxes", function()
 				if bound_min then
 					debugoverlay.BoxAngles(bonepos, bound_min, bound_max, boneang, 0.1, Color(0, 255, 0, 1), false)
 				end
-				debugoverlay.Text(bonepos, nb:GetBoneName(bone), 0.1)
+				debugoverlay.Text(bonepos, string.format("%d: %s", hitbox, nb:GetBoneName(bone)), 0.1)
 
 				print( "Hit box group " .. group .. ", hitbox " .. hitbox .. " is attached to bone " .. nb:GetBoneName( bone ) )
 			end
