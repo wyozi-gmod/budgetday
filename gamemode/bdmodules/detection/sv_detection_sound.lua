@@ -2,8 +2,8 @@ local soundfile_detection = {
     {
         match = function(soundname) return soundname:find("footstep") end,
 
-        suspicion = 0.02,
-        falloff_exp = 1.5,
+        suspicion = 0.15,
+        falloff_exp = 2,
         cause = "heard_footstep"
     },
     {
@@ -20,8 +20,8 @@ local soundfile_detection = {
         -- Body fall raises a lot of suspicion but falls off really quickly
         --  -> killing people close to other guards is no good
         suspicion = 0.5,
-        falloff = 48,
-        falloff_exp = 1.5,
+        falloff = 64,
+        falloff_exp = 2,
         cause = "heard_body",
         pos = function(data) return data.Entity:GetPos() end
     }
