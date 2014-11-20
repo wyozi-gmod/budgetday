@@ -28,3 +28,30 @@ hook.Add("PostDrawOpaqueRenderables", "BDDrawDetectionStatus", function()
 	    guard.LastDetection = det
 	end
 end)
+
+local icon_phone = Material("icon16/phone_sound.png")
+
+hook.Add("HUDPaint", "BD.DrawCallingPoliceStatus", function()
+	for _,guard in pairs(ents.FindByClass("bd_nextbot*")) do
+		local cfh_start = guard:GetNWFloat("CallingForHelp")
+		if cfh_start and cfh_start ~= 0 then
+			local elapsed = CurTime() - cfh_start
+			local ts = (guard:GetPos() + Vector(0, 0, 60)):ToScreen()
+
+			if not guard.NextCallBeep or guard.NextCallBeep <= CurTime() then
+				guard:EmitSound("npc/combine_gunship/ping_search.wav", 120)
+
+				guard.NextCallBeep = CurTime() + 1
+			end
+
+			if ts.visible then
+				surface.SetMaterial(icon_phone)
+				surface.SetDrawColor(255, 127, 0)
+
+				local size = 20 + math.cos(elapsed * 7)*6
+
+				surface.DrawTexturedRect(ts.x-size/2, ts.y-size/2, size, size)
+			end
+		end
+	end
+end)

@@ -40,7 +40,7 @@ function ENT:StartMovingTo(move_data)
 	self:MoveToPos(move_data.pos, {
 		terminate_condition = function()
 			self:UpdateSightSuspicion()
-			
+
 			if self:GetSuspicionLevel() >= 1 then
 				return true
 			end
@@ -52,22 +52,44 @@ end
 
 
 function ENT:AlarmedMode(poi)
-	if not self.IsAlarmed then
-		if poi then
-			self.loco:FaceTowards(poi.pos)
-		end
-
-		self:GiveWeapon("weapon_bd_usp")
-		self:PlaySequenceAndWait("drawpistol")
-		--ent:PlaySequenceAndWait("Stand_to_crouchpistol")
-		--ent:SetSequence("Crouch_idle_pistol")
-		self.IsAlarmed = true
-	end
+	-- First we check for valid targets to shoot at
 
 	local shoot_targ
 	self:UpdateSightSuspicion(function(data)
 		if data.ent:IsPlayer() then shoot_targ = data.ent end
 	end)
+
+	local force_rearm = false
+
+	-- If we're in alarmed mode and there is nothing to shoot, we will call for help
+	if not self.HasCalledForHelp and not shoot_targ then
+		self:SetNWBool("CallingForHelp", CurTime())
+
+		self:SetSequence("harrassidle")
+
+		coroutine.wait(math.random(0.6, 1.3))
+
+		-- Just spout random crap. Rofl
+		self:EmitSound("npc/combine_soldier/vo/isfinalteamunitbackup.wav")
+		coroutine.wait(2 + math.random(0.1, 1))
+		self:EmitSound("npc/combine_soldier/vo/heavyresistance.wav")
+		coroutine.wait(1.5 + math.random(0.1, 1.5))
+
+		-- TODO this is the part where police is officially informed
+
+		self:SetNWFloat("CallingForHelp", 0)
+
+		self.HasCalledForHelp = true
+
+		force_rearm = true
+	end
+
+	if not self.IsArmed or force_rearm then
+		self:GiveWeapon("weapon_bd_usp")
+		self:PlaySequenceAndWait("drawpistol")
+
+		self.IsArmed = true
+	end
 
 	if IsValid(shoot_targ) and bd.util.ComputeLos(self, shoot_targ) then
 		self.loco:FaceTowards(shoot_targ:GetBonePosition(shoot_targ:LookupBone("ValveBiped.Bip01_Spine")))
