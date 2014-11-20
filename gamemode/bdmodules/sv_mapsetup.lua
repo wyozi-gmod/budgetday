@@ -16,7 +16,12 @@ local function SpawnMapNPCs()
 		npc:Activate()
 		npc:Spawn()
 
-		npc:AddFlashlight()
+		local citem = spawner:GetCarryItem()
+		if citem == "flashlight" then
+			npc:AddFlashlight()
+		elseif citem == "coffee" then
+			npc:AddCoffeeCup()
+		end
 	end
 end
 

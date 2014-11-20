@@ -20,7 +20,8 @@ end
 
 bd.interactions.Register("door_lockpick", {
 	filter = function(ent, ply)
-		return ent:GetClass() == "prop_door_rotating" and not ent:GetNWBool("lockpicked")
+		local entcls = ent:GetClass()
+		return (entcls == "prop_door_rotating" or entcls == "func_door_rotating") and not ent:GetNWBool("lockpicked")
 	end,
 	help = function(ent, ply) return "Lockpick" end,
 	finish = function(ent, ply)

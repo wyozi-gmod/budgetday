@@ -184,6 +184,9 @@ function ENT:Initialize()
 
 		self:SetHealth(self.StartingHealth)
 		self.Armor = table.Copy(self.StartingArmor)
+
+		-- List of callbacks to call when equipping a pistol
+		self.OnArm = {}
 	end
 end
 
@@ -218,6 +221,40 @@ function ENT:AddFlashlight()
     wep:Fire("setparentattachment", "anim_attachment_LH")
 
     self.Flashlight = wep
+
+	table.insert(self.OnArm, function() if IsValid(self.Flashlight) then self.Flashlight:Remove() end end)
+end
+
+
+-- hashtag coding priorities
+function ENT:AddCoffeeCup()
+	local shootpos = self:GetAttachment(self:LookupAttachment("anim_attachment_LH"))
+
+	local prop = ents.Create("prop_physics")
+	prop:SetModel(Model("models/props/cs_office/coffee_mug.mdl"))
+	prop:SetOwner(self)
+
+	prop:Spawn()
+
+	prop:SetSolid(SOLID_NONE)
+	prop:SetParent(self)
+
+	prop:Fire("setparentattachment", "anim_attachment_LH")
+	prop:SetLocalAngles(Angle(0, 90, 0))
+
+	self.CoffeeCup = prop
+
+	table.insert(self.OnArm, function()
+		if IsValid(prop) then
+			prop:SetParent(nil)
+
+			prop:SetMoveType(MOVETYPE_VPHYSICS)
+			prop:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+			prop:SetSolid(SOLID_VPHYSICS)
+
+			prop:SetPos(self:GetAttachment(self:LookupAttachment("anim_attachment_LH")).Pos)
+		end
+	end)
 end
 
 
@@ -250,12 +287,7 @@ function ENT:GiveWeapon(weaponcls)
 
 	self.Weapon = wep
 
-	-- If we had a flashlight, we remove that and attach a flashlight to our weapon
-	if IsValid(self.Flashlight) then
-		self.Flashlight:Remove()
-
-		-- TODO attach flashlight to the weapon
-	end
+	for _,fn in pairs(self.OnArm) do fn() end
 end
 
 function ENT:GetActiveWeapon()
