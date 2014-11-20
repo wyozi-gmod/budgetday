@@ -25,9 +25,10 @@ local function GetMonitorObjects(monitor, callback)
 
 		local is_los_clear = bd.util.ComputeLos(pos, ce)
 
-		local reqval = {dist=768, dot=0.65}
-
-		--MsgN(ce, " dist: ", (dist < reqval.dist), " dot: ", (dot < reqval.dot), " los: ", is_los_clear)
+		-- TODO instead of this ComputeLOSEntities should be extracted from nextbot base to los utils
+		-- for now this is I think cheaper way to compute the entities in camera's LOS so it's not
+		-- urgent
+		local reqval = {dist=acam.Sight.distance, dot=math.cos(math.rad(acam.Sight.angle))}
 
 		if dist < reqval.dist and dot > reqval.dot and is_los_clear then
 			callback(ce, nil, acam)
