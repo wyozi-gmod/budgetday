@@ -23,7 +23,7 @@ local soundfile_detection = {
         --  -> killing people close to other guards is no good
         suspicion = 0.5,
         falloff = 64,
-        falloff_exp = 2,
+        falloff_exp = 1.75,
         cause = "heard_body",
         pos = function(data) return data.Entity:GetPos() end
     }
@@ -77,8 +77,6 @@ hook.Add("EntityEmitSound", "BDDetectSounds", function(data)
                 if sound_data.falloff_exp then falloff_exp = sound_data.falloff_exp end
             end
         end
-
-        MsgN(data.SoundName)
 
         if suspicion > 0 and pos and cause then
             for _,npc in pairs(ents.FindByClass("bd_nextbot*")) do

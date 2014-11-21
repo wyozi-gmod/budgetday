@@ -1,6 +1,7 @@
 
 local debug_dist = CreateConVar("bd_debug_distractions", "0")
 local debug_falloff = CreateConVar("bd_debug_sound_falloff", "0")
+local debug_falloff_filter = CreateConVar("bd_debug_sound_falloff_filter", "")
 local debug_distclusters = CreateConVar("bd_debug_distractionclusters", "0")
 local debug_sight = CreateConVar("bd_debug_sight", "0")
 local debug_losents = CreateConVar("bd_debug_losentities", "0")
@@ -28,6 +29,9 @@ hook.Add("BDNextbotDistraction", "BD.DebugSoundFalloff", function(nextbot, data)
 	if not debug_falloff:GetBool() then return end
 
 	if not data.debug_data or not data.debug_data.falloff then return end
+	
+	local filter = debug_falloff_filter:GetString()
+	if filter ~= "" and not data.cause:find(filter) then return end
 
 	local falloff = data.debug_data.falloff
 	local falloff_exp = data.debug_data.falloff_exp or 1
