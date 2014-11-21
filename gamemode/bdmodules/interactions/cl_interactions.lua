@@ -86,7 +86,7 @@ hook.Add("HUDPaint", "BD_InteractHelp", function()
 				if iact_menu_ent == tr.Entity then
 					text_rect("Interactions", Color(100, 255, 100, 50))
 					for idx,ianame in pairs(ias) do
-						local interaction = Get(ianame)
+						local interaction = MODULE.Get(ianame)
 
 						text_rect(interaction.help(tr.Entity, LocalPlayer()), _, tostring(idx))
 					end
