@@ -52,7 +52,11 @@ end
 
 
 function ENT:AlarmedMode(poi)
-	-- First we check for valid targets to shoot at
+
+	-- Before calling for help lets turn towards POI position to see if theres some to shoot at there
+	if not self.HasCalledForHelp and poi and poi.spotted_directly and poi.pos then
+		self.loco:FaceTowards(poi.pos)
+	end
 
 	local shoot_targ
 	self:UpdateSightSuspicion(function(data)

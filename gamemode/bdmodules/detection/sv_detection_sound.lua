@@ -44,7 +44,8 @@ hook.Add("EntityEmitSound", "BDDetectSounds", function(data)
         local falloff = 64 -- How quickly suspicion falls off over distance.
         local falloff_exp = 1
 
-        if data.Channel == 1 then -- weapon
+        -- weapon
+        if data.Channel == 1 and data.OriginalSoundName ~= "BaseCombatCharacter.StopWeaponSounds" then
             local wep_detection = weapon_soundfile_detection[data.SoundName]
 
             local is_silenced = wep_detection and wep_detection.silenced or false
