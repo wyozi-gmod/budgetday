@@ -29,7 +29,7 @@ hook.Add("BDNextbotDistraction", "BD.DebugSoundFalloff", function(nextbot, data)
 	if not debug_falloff:GetBool() then return end
 
 	if not data.debug_data or not data.debug_data.falloff then return end
-	
+
 	local filter = debug_falloff_filter:GetString()
 	if filter ~= "" and not data.cause:find(filter) then return end
 
@@ -62,7 +62,7 @@ end)
 hook.Add("Think", "BD.DebugNextbotDistractionClusters", function(nextbot, data)
 	if not debug_distclusters:GetBool() then return end
 
-	for _,nb in pairs(ents.FindByClass("bd_nextbot*")) do
+	for _,nb in pairs(bd.util.GetGuards()) do
 		local clusters = nb:ComputeDistractionClusters()
 
 		for groupname,group in pairs(clusters) do
@@ -108,7 +108,7 @@ end)
 hook.Add("Think", "BD.DebugLOSEntities", function()
 	if not debug_losents:GetBool() then return end
 
-	for _,ent in pairs(ents.FindByClass("bd_nextbot*")) do
+	for _,ent in pairs(bd.util.GetGuards()) do
 
 		local spotted_ents = ent:ComputeLOSEntities({
 			filter = function(ent) return ent:IsPlayer() or ent:GetClass() == "prop_ragdoll" or ent:GetClass():StartWith("bd_nextbot*") end

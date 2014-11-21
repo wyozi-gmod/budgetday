@@ -6,7 +6,7 @@ surface.CreateFont("BDDetectionFont", {
 })
 
 hook.Add("PostDrawOpaqueRenderables", "BDDrawDetectionStatus", function()
-	for _,guard in pairs(ents.FindByClass("bd_nextbot*")) do
+	for _,guard in pairs(bd.util.GetGuards()) do
 		local det = guard:GetNWFloat("Suspicion")
 		local lastdet = guard.LastDetection
 
@@ -32,7 +32,7 @@ end)
 local icon_phone = Material("icon16/phone_sound.png")
 
 hook.Add("HUDPaint", "BD.DrawCallingPoliceStatus", function()
-	for _,guard in pairs(ents.FindByClass("bd_nextbot*")) do
+	for _,guard in pairs(bd.util.GetGuards()) do
 		local cfh_start = guard:GetNWFloat("CallingForHelp")
 		if cfh_start and cfh_start ~= 0 then
 			local elapsed = CurTime() - cfh_start

@@ -10,8 +10,8 @@ local function GetMonitorObjects(monitor, callback)
 	local spotter_ent = acam
 
 	local check_ents = {}
-	table.Add(check_ents, ents.FindByClass("bd_nextbot*"))
-	table.Add(check_ents, ents.FindByClass("prop_ragdoll"))
+	table.Add(check_ents, bd.util.GetGuards())
+	table.Add(check_ents, bd.util.GetGuardRagdolls())
 
 	callback(acam, Color(127, 255, 0))
 

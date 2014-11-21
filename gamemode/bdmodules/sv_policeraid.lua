@@ -11,7 +11,7 @@ function MODULE.Start()
         ms:TriggerOutput("PoliceInformed", ms)
     end
 
-    for _,nb in pairs(ents.FindByClass("bd_nextbot*")) do
+    for _,nb in pairs(bd.util.GetGuards()) do
         -- This needs to be true so that they don't call for help again
         -- TODO make it a method?
         nb.HasCalledForHelp = true

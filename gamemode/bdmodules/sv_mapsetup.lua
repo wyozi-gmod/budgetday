@@ -12,6 +12,7 @@ local function SpawnMapNPCs()
 		npc:SetAngles(spawner:GetAngles())
 
 		npc.NPCType = t
+		npc:SetNWString("NPCType", t)
 
 		npc:Activate()
 		npc:Spawn()
