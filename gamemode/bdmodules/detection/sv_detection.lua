@@ -32,3 +32,23 @@ hook.Add("BDGuardSpotted", "BDRaiseGuardSuspicion", function(data)
 		guard:NotifyDistraction({level = incr, pos = ent:GetPos(), spotter_ent = data.spotter, cause = cause})
 	end
 end)
+
+local time_per_decrtick = 0.2
+hook.Add("Think", "BD.LowerGuardSuspicionOverTime", function()
+	for _,guard in pairs(bd.util.GetGuards()) do
+		local decr_suspicion_by = 0
+		if guard.DistractionHistory then
+			local elapsed = CurTime() - guard.DistractionHistory[#guard.DistractionHistory].happened
+			if elapsed > 1 then
+				decr_suspicion_by = 0.01 * (2^(elapsed*0.2)) * time_per_decrtick
+			end
+		end
+
+		if guard:GetSuspicionLevel() > 0 and (not guard.NextLowerSusp or guard.NextLowerSusp <= CurTime()) then
+			local old = guard:GetSuspicionLevel()
+
+			guard:SetSuspicionLevel(math.max(0, guard:GetSuspicionLevel() - decr_suspicion_by))
+			guard.NextLowerSusp = CurTime() + time_per_decrtick
+		end
+	end
+end)
