@@ -6,11 +6,8 @@ function GM:PlayerSpawn(ply)
 	ply:SetModel("models/player/alyx.mdl")
 
 	ply:StripWeapons()
-	ply:Give("bd_aisah")
 	ply:Give("weapon_bd_usp")
-	ply:Give("weapon_bd_grapphook")
 
-	ply:GiveSkill("aisah")
 	ply:GiveSkill("aisah_vitalstats")
 	ply:GiveSkill("aisah_nightvision")
 
@@ -36,7 +33,3 @@ function GM:PlayerSetHandsModel( ply, ent )
 		ent:SetBodyGroups( info.body )
 	end
 end
-
-hook.Add("PlayerDeath", "BD_RemovePlyAisah", function(ply)
-	ply:BD_SetBool("wear_aisah", false)
-end)

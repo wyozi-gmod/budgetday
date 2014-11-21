@@ -112,8 +112,6 @@ comp_meta.bars = function(self, value, max)
 end
 
 hook.Add("HUDPaint", "BD_AISAH", function()
-	if not LocalPlayer():BD_GetBool("wear_aisah") then return end
-
 	local x,y = 20, 100
 
 	for _,mod in pairs(MODULE.AISAHModules) do

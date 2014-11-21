@@ -20,8 +20,6 @@ end
 local keyhistory = {}
 
 hook.Add("Think", "BD_HandleAISAHInput", function()
-	if not LocalPlayer():BD_GetBool("wear_aisah") then return end
-
 	local keys = {}
 	if input.IsControlDown() then table.insert(keys, "CTRL") end
 	if input.IsShiftDown() then table.insert(keys, "SHIFT") end
@@ -46,8 +44,6 @@ end)
 
 -- Handle input
 hook.Add("PlayerBindPress", "BD_AISAH", function(ply, bind, pressed)
-	if not LocalPlayer():BD_GetBool("wear_aisah") then return end
-
 	if pressed then
 		local mod = bd.aisah.FindModule(function(mod)
 			return mod.RegisteredBindInputs and mod.RegisteredBindInputs[bind] and mod:Has(LocalPlayer())

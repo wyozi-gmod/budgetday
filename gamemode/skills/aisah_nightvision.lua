@@ -44,7 +44,7 @@ if CLIENT then
 	end
 
 	hook.Add("RenderScreenspaceEffects", "BD_AISAH_NightVision", function()
-	    if not LocalPlayer():BD_GetBool("wear_aisah") or not LocalPlayer():HasSkill("aisah_nightvision") then return end
+	    if not LocalPlayer():HasSkill("aisah_nightvision") then return end
 
 	    local lvl = LocalPlayer():BD_GetInt("nv_level", 0)
 	    DrawNightVision(lvl)
