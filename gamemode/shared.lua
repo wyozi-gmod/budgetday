@@ -16,7 +16,18 @@ function loader.shared(file)
 end
 
 function loader.luafiles(folder, filfilter)
-	return file.Find("budgetday/gamemode/" .. folder .. "/" .. (filfilter or "*"), "LUA")
+	-- file.Find returns gamemode files only if the gamemode name is explicitly specified here
+	local gm_fils, gm_fols = file.Find(GM.FolderName .. "/gamemode/" .. folder .. "/" .. (filfilter or "*"), "LUA")
+	local addon_fils, addon_fols = file.Find(folder .. "/" .. (filfilter or "*"), "LUA")
+
+	local fils, fols = {}, {}
+
+	table.Add(fils, gm_fils)
+	table.Add(fils, addon_fils)
+	table.Add(fols, gm_fols)
+	table.Add(fols, addon_fols)
+
+	return fils, fols
 end
 
 -- Global table for all storage needs
