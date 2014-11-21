@@ -5,12 +5,11 @@ local iact_menu_ent
 hook.Add("PlayerBindPress", "BD_HandleInteraction", function(ply, bind, pressed)
 	local tr = LocalPlayer():GetEyeTrace()
 
-	if bind:sub(1, 4) == "slot" and pressed and tr.Entity == iact_menu_ent then
-		local slot_idx = tonumber(bind:sub(5))
+	if pressed and IsValid(tr.Entity) and tr.Entity:GetPos():Distance(LocalPlayer():EyePos()) <= MODULE.MaxInteractDistance then
+		local ias = tr.Entity:BD_GetValidInteractions(LocalPlayer())
 
-		if IsValid(tr.Entity) then
-			local ias = tr.Entity:BD_GetValidInteractions(LocalPlayer())
-
+		if bind:sub(1, 4) == "slot" and tr.Entity == iact_menu_ent then
+			local slot_idx = tonumber(bind:sub(5))
 			local ia_name = ias[slot_idx]
 
 			if ia_name then
@@ -22,22 +21,17 @@ hook.Add("PlayerBindPress", "BD_HandleInteraction", function(ply, bind, pressed)
 				iact_menu_ent = nil
 				return true
 			end
-		end
-	end
-	if bind == "+use" and pressed and tr.Entity ~= iact_menu_ent then
-		if IsValid(tr.Entity) and tr.Entity:GetPos():Distance(LocalPlayer():EyePos()) <= MODULE.MaxInteractDistance then
-			local ias = tr.Entity:BD_GetValidInteractions(LocalPlayer())
-
+		elseif bind == "+use" then
 			if #ias == 1 then
 				net.Start("bd_startinteract")
-					net.WriteEntity(tr.Entity)
-					net.WriteString(ias[1])
+				net.WriteEntity(tr.Entity)
+				net.WriteString(ias[1])
 				net.SendToServer()
 
 				return true
 			elseif #ias > 0 then
 				iact_menu_ent = tr.Entity
-
+				
 				return true
 			end
 		end

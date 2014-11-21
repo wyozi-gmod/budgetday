@@ -57,17 +57,45 @@ bd.interactions.Register("body_drag", {
 		end
 	end,
 	cancel = function(ent, ply) end,
-	length = function() return 0.5 end
+	length = function() return 0.5 end,
+	menu_priority = 10
 })
 
 local entmeta = FindMetaTable("Entity")
 function entmeta:BD_GetValidInteractions(interacting_ply)
 	local ia = {}
+
+	-- If one of the interactions has a priority, we need to sort the interaction table
+	local sort_needed = false
+
 	for name,tbl in pairs(MODULE.Interactions) do
 		if tbl.filter(self, interacting_ply) then
-			table.insert(ia, name)
+			if tbl.menu_priority then
+				table.insert(ia, {name = name, priority = tbl.menu_priority})
+				sort_needed = true
+			else
+				table.insert(ia, name)
+			end
 		end
 	end
+
+	if sort_needed then
+		-- Sort table, biggest priority first
+		table.sort(ia, function(a, b)
+			local a_prio = type(a) == "table" and a.priority or 0
+			local b_prio = type(b) == "table" and b.priority or 0
+
+			return a_prio > b_prio
+		end)
+
+		-- Flatten table
+		for key,val in pairs(ia) do
+			if type(val) == "table" then
+				ia[key] = val.name
+			end
+		end
+	end
+
 	return ia
 end
 
