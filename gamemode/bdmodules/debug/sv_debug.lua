@@ -1,5 +1,6 @@
 
 local debug_dist = CreateConVar("bd_debug_distractions", "0")
+local debug_falloff = CreateConVar("bd_debug_sound_falloff", "0")
 local debug_distclusters = CreateConVar("bd_debug_distractionclusters", "0")
 local debug_sight = CreateConVar("bd_debug_sight", "0")
 local debug_losents = CreateConVar("bd_debug_losentities", "0")
@@ -21,6 +22,37 @@ hook.Add("BDNextbotDistraction", "BD.DebugDistractions", function(nextbot, data)
 	end
 
 	MsgN(nextbot, " distraction: ", math.Round(data.level, 3) , " to ", nextbot:GetSuspicionLevel(), " caused by ", data.cause)
+end)
+
+hook.Add("BDNextbotDistraction", "BD.DebugSoundFalloff", function(nextbot, data)
+	if not debug_falloff:GetBool() then return end
+
+	if not data.debug_data or not data.debug_data.falloff then return end
+
+	local falloff = data.debug_data.falloff
+	local falloff_exp = data.debug_data.falloff_exp or 1
+
+	-- This is how suspicionmul is calculated:
+	--   1 / math.pow(dist/falloff, falloff_exp)
+	--
+	-- To get distance from suspicionmul, we can use the following equation
+	--  (derived from suspicionmul calculation algebraically, nothing magical)
+	--
+	--  dist = falloff * math.pow(1/suspicionmul, 1/falloff_exp)
+	--
+	-- To give developer a nice view of how falloff works, we start from x = 1/2
+	-- and multiply that by 1/2 for y amount of times, and draw the lines
+
+	local old_point = bd.util.GetEntPosition(nextbot)
+	local norm_diff = (data.pos - old_point):GetNormalized()
+	for p=1, 4 do
+		local suspmul = math.pow(0.5, p)
+		local dist = falloff * math.pow(1/suspmul, 1/falloff_exp)
+
+		debugoverlay.Sphere(data.pos, dist, 1, Color(255, 255, 255, 64*suspmul), true)
+	end
+
+	MsgN(data.cause, table.ToString(data.debug_data))
 end)
 
 hook.Add("Think", "BD.DebugNextbotDistractionClusters", function(nextbot, data)

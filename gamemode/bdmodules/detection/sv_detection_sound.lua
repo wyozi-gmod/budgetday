@@ -1,6 +1,8 @@
 local soundfile_detection = {
     {
-        match = function(soundname) return soundname:find("footstep") end,
+        match = function(soundname)
+            return soundname:find("footstep") or soundname:find("glass_sheet_step")
+        end,
 
         suspicion = 0.15,
         falloff_exp = 2,
@@ -36,7 +38,7 @@ hook.Add("EntityEmitSound", "BDDetectSounds", function(data)
 
     if IsValid(ent) then
         local suspicion = 0.01
-        local cause = "heard_unknown"
+        local cause
         local pos = data.Pos
 
         local falloff = 64 -- How quickly suspicion falls off over distance.
@@ -76,7 +78,9 @@ hook.Add("EntityEmitSound", "BDDetectSounds", function(data)
             end
         end
 
-        if suspicion > 0 and pos then
+        MsgN(data.SoundName)
+
+        if suspicion > 0 and pos and cause then
             for _,npc in pairs(ents.FindByClass("bd_nextbot*")) do
                 local dist = npc:GetPos():Distance(pos)
 
@@ -84,7 +88,16 @@ hook.Add("EntityEmitSound", "BDDetectSounds", function(data)
 
                 local level = suspicionmul * suspicion
                 if level > 0.001 then
-                    npc:NotifyDistraction({level = suspicionmul*suspicion, pos = pos, cause = cause, debug_data = {suspmul = suspicionmul}})
+                    npc:NotifyDistraction({
+                        level = suspicionmul*suspicion,
+                        pos = pos,
+                        cause = cause,
+                        debug_data = {
+                            suspmul = suspicionmul,
+                            falloff = falloff,
+                            falloff_exp = falloff_exp
+                        }
+                    })
                 end
             end
         end
