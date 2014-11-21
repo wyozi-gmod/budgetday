@@ -5,6 +5,7 @@ ENT.Base = "base_point"
 
 function ENT:SetupDataTables()
 	self:NetworkVar("String", 0, "FirstObjectiveName", {KeyName = "firstobjective"})
+	self:NetworkVar("String", 1, "StageSettings", {KeyName = "stagesettings"})
 end
 
 function ENT:KeyValue( key, value )

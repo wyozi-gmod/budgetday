@@ -42,6 +42,8 @@
 [
 	firstobjective(target_destination) : "First Objective" : "" : "Should point to the first main bd_objective of the stage"
 
+	stagesettings(string) : "Stage Settings" : "" : "Space delimited list of flags and options. For example 'pagers=1' to enable pagers on guards (requires an addon)"
+
 	input MissionAccomplished(void) : "Call to end the whole mission succesfully. Usually triggers a map vote or restart the current mission after a short delay."
 	input MissionFailed(string) : "Call to end the mission prematurely due to a failure. The string argument is the reason for the failure. The string is replaced with language specific equivalent, if it is one of the following: player_spotted, ragdoll_spotted, item_spotted"
 
