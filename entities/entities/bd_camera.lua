@@ -54,7 +54,9 @@ bd.interactions.Register("camera_mitm", {
 		ply:SetNWEntity("BD_CameraMITM", ent)
 	end,
 	cancel = function(ent, ply) end,
-	length = function() return 1 end
+	length = function() return 1 end,
+
+	menu_icon = Material("icon16/eye.png")
 })
 
 if CLIENT then

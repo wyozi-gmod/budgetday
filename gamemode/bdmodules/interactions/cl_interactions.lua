@@ -43,7 +43,8 @@ hook.Add("HUDPaint", "BD_InteractHelp", function()
 
 	local x = ScrW()/2 - 100
 	local y = ScrH()/2 + 25
-	local w, h = 200, 20
+	local w, h = 220, 22
+
 	local function text_rect(text, data)
 
 		local bgclr = (data and data.bgclr) or Color(255, 0, 0, 50)
@@ -57,7 +58,7 @@ hook.Add("HUDPaint", "BD_InteractHelp", function()
 
 		surface.SetDrawColor(keybgclr)
 		surface.DrawRect(x+2, y+2, 16, h-4)
-		draw.SimpleText(keytext or "", "Trebuchet18", x+10, y+1, _, TEXT_ALIGN_CENTER)
+		draw.SimpleText(keytext or "", "Trebuchet18", x+10, y+h/2, _, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		local prog = bgprogress or 1
 
@@ -68,13 +69,15 @@ hook.Add("HUDPaint", "BD_InteractHelp", function()
 		if icon then
 			surface.SetDrawColor(255, 255, 255)
 			surface.SetMaterial(icon)
-			surface.DrawTexturedRect(x+x_off, y+3, 16, 16)
+			local icon_size = 16
 
-			x_off = x_off + 18
+			surface.DrawTexturedRect(x+x_off, y+((h-icon_size)/2), icon_size, icon_size)
+
+			x_off = x_off + 20
 		end
-		draw.SimpleText(text, "Trebuchet18", x+x_off, y+1, _, TEXT_ALIGN_LEFT)
+		draw.SimpleText(text, "Trebuchet18", x+x_off, y+h/2, _, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 
-		y = y + 20
+		y = y + h
 	end
 
 	if ply:BD_GetInteraction() then
@@ -86,10 +89,11 @@ hook.Add("HUDPaint", "BD_InteractHelp", function()
 
 			local time_left = meta.length(targ, ply) * (1-progress)
 
-			text_rect(ply:BD_GetInteractionMeta().help(targ, ply), {
+			text_rect(ply:BD_GetInteractionMeta().help(targ, ply, true), {
 				bgclr=Color(255, 0, 0, 50),
 				bgprogress=progress,
-				keytext=tostring(math.ceil(time_left))
+				keytext=tostring(math.abs(math.ceil(time_left))),
+				icon = meta.menu_icon
 			})
 		end
 	else
@@ -98,7 +102,8 @@ hook.Add("HUDPaint", "BD_InteractHelp", function()
 			local ias = tr.Entity:BD_GetValidInteractions(ply)
 
 			if #ias == 1 then
-				text_rect(MODULE.Get(ias[1]).help(tr.Entity, ply), {keytext="e"})
+				local interaction = MODULE.Get(ias[1])
+				text_rect(interaction.help(tr.Entity, ply), {keytext="e", icon=interaction.menu_icon})
 			elseif #ias > 0 then
 				if iact_menu_ent == tr.Entity then
 					text_rect("Interactions", Color(100, 255, 100, 50))

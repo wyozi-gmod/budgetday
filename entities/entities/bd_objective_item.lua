@@ -50,14 +50,17 @@ end
 
 bd.interactions.Register("objective_item_pickup", {
 	filter = function(ent, ply) return ent:GetClass() == "bd_objective_item" end,
-	help = function(ent, ply) return "Pickup" end,
+	help = function(ent, ply, interacting) return interacting and "Picking up" or "Pick up" end,
 	finish = function(ent, ply)
 		ent:InteractionFinished(ply)
 	end,
 	cancel = function(ent, ply)
 		ent:InteractionCanceled(ply)
 	end,
-	length = function(ent) return ent:GetInteractLength() end
+	length = function(ent) return ent:GetInteractLength() end,
+
+	menu_priority = 10,
+	menu_icon = Material("icon16/briefcase.png")
 })
 
 function ENT:Initialize()

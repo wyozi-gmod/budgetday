@@ -74,7 +74,9 @@ bd.interactions.Register("cameramonitor_bug", {
 	help = function(ent, ply) return "Tap video and show on HUD" end,
 	finish = function(ent, ply) ent:SetNWBool("Bugged", true) end,
 	cancel = function(ent, ply) end,
-	length = function() return 5 end
+	length = function() return 5 end,
+
+	menu_icon = Material("icon16/eye.png")
 })
 
 if CLIENT then
