@@ -31,7 +31,7 @@ hook.Add("PlayerBindPress", "BD_HandleInteraction", function(ply, bind, pressed)
 				return true
 			elseif #ias > 0 then
 				iact_menu_ent = tr.Entity
-				
+
 				return true
 			end
 		end
@@ -39,12 +39,18 @@ hook.Add("PlayerBindPress", "BD_HandleInteraction", function(ply, bind, pressed)
 end)
 
 hook.Add("HUDPaint", "BD_InteractHelp", function()
+	local ply = LocalPlayer()
+
 	local x = ScrW()/2 - 100
 	local y = ScrH()/2 + 25
 	local w, h = 200, 20
-	local function text_rect(text, bgclr, keytext, keybgclr, bgprogress)
-		bgclr = bgclr or Color(255, 0, 0, 50)
-		keybgclr = keybgclr or Color(255, 127, 0, 50)
+	local function text_rect(text, data)
+
+		local bgclr = (data and data.bgclr) or Color(255, 0, 0, 50)
+		local keybgclr = (data and data.keybgclr) or Color(255, 127, 0, 50)
+		local keytext = (data and data.keytext)
+		local bgprogress = (data and data.bgprogress)
+		local icon = (data and data.icon)
 
 		surface.SetDrawColor(0, 0, 0, 150)
 		surface.DrawRect(x, y, w, h)
@@ -57,35 +63,52 @@ hook.Add("HUDPaint", "BD_InteractHelp", function()
 
 		surface.SetDrawColor(bgclr)
 		surface.DrawRect(x+20, y+2, (w-22) * prog, h-4)
-		draw.SimpleText(text, "Trebuchet18", x+22, y+1, _, TEXT_ALIGN_LEFT)
+
+		local x_off = 22
+		if icon then
+			surface.SetDrawColor(255, 255, 255)
+			surface.SetMaterial(icon)
+			surface.DrawTexturedRect(x+x_off, y+3, 16, 16)
+
+			x_off = x_off + 18
+		end
+		draw.SimpleText(text, "Trebuchet18", x+x_off, y+1, _, TEXT_ALIGN_LEFT)
 
 		y = y + 20
 	end
 
-	if LocalPlayer():BD_GetInteraction() then
-		local meta = LocalPlayer():BD_GetInteractionMeta()
-		local targ = LocalPlayer():BD_GetInteractionTarget()
+	if ply:BD_GetInteraction() then
+		local meta = ply:BD_GetInteractionMeta()
+		local targ = ply:BD_GetInteractionTarget()
 
 		if IsValid(targ) then
-			text_rect(LocalPlayer():BD_GetInteractionMeta().help(targ, LocalPlayer()), _, "", Color(255, 0, 0, 50), LocalPlayer():BD_GetInteractionProgress())
+			local progress = ply:BD_GetInteractionProgress()
+
+			local time_left = meta.length(targ, ply) * (1-progress)
+
+			text_rect(ply:BD_GetInteractionMeta().help(targ, ply), {
+				bgclr=Color(255, 0, 0, 50),
+				bgprogress=progress,
+				keytext=tostring(math.ceil(time_left))
+			})
 		end
 	else
-		local tr = LocalPlayer():GetEyeTrace()
-		if IsValid(tr.Entity) and tr.Entity:GetPos():Distance(LocalPlayer():EyePos()) <= MODULE.MaxInteractDistance then
-			local ias = tr.Entity:BD_GetValidInteractions(LocalPlayer())
+		local tr = ply:GetEyeTrace()
+		if IsValid(tr.Entity) and tr.Entity:GetPos():Distance(ply:EyePos()) <= MODULE.MaxInteractDistance then
+			local ias = tr.Entity:BD_GetValidInteractions(ply)
 
 			if #ias == 1 then
-				text_rect(MODULE.Get(ias[1]).help(tr.Entity, LocalPlayer()), _, "e")
+				text_rect(MODULE.Get(ias[1]).help(tr.Entity, ply), {keytext="e"})
 			elseif #ias > 0 then
 				if iact_menu_ent == tr.Entity then
 					text_rect("Interactions", Color(100, 255, 100, 50))
 					for idx,ianame in pairs(ias) do
 						local interaction = MODULE.Get(ianame)
 
-						text_rect(interaction.help(tr.Entity, LocalPlayer()), _, tostring(idx))
+						text_rect(interaction.help(tr.Entity, ply), {keytext=tostring(idx), icon=interaction.menu_icon})
 					end
 				else
-					text_rect("Open interactions menu", Color(100, 255, 100, 50), "e")
+					text_rect("Open interactions menu", {bgclr=Color(100, 255, 100, 50), keytext="e"})
 				end
 			end
 		end

@@ -58,7 +58,9 @@ bd.interactions.Register("body_drag", {
 	end,
 	cancel = function(ent, ply) end,
 	length = function() return 0.5 end,
-	menu_priority = 10
+
+	menu_priority = 10,
+	menu_icon = Material("icon16/lorry.png")
 })
 
 local entmeta = FindMetaTable("Entity")
