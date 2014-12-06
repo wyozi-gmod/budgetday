@@ -11,9 +11,6 @@ function GM:PlayerSpawn(ply)
 	ply:GiveSkill("aisah_vitalstats")
 	ply:GiveSkill("aisah_nightvision")
 
-	ply:SetWalkSpeed(170)
-	ply:SetRunSpeed(235)
-
 	ply:SetupHands() -- Create the hands and call GM:PlayerSetHandsModel
 end
 

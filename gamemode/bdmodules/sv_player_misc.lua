@@ -1,5 +1,7 @@
 
--- We handle falldamage in the following function
+--[[
+FALL DAMAGE
+]]
 function GM:GetFallDamage(ply, speed)
 	return 1
 end
@@ -22,20 +24,49 @@ function GM:OnPlayerHitGround(ply, in_water, on_floater, speed)
 		ply:EmitSound("physics/body/body_medium_impact_soft1.wav", _, _, math.Clamp(damage/100, 0, 1))
 	end
 end
-local plymeta = FindMetaTable("Player")
-function plymeta:SetSprintEnabled(b)
-	if self.SprintEnabled == b then return end
 
-	if b then
-		self:SetRunSpeed(self.OldRunSpeed)
-	else
-		self.OldRunSpeed = self:GetRunSpeed()
-		self:SetRunSpeed(self:GetWalkSpeed())
-	end
+--[[
+PLAYER MOVE SPEED MODIFIERS
+]]
 
-	self.SprintEnabled = b
+local speed_modifier_meta = {}
+speed_modifier_meta.__index = speed_modifier_meta
+
+function speed_modifier_meta:Scale(mul)
+	self.Speed = self.Speed * mul
 end
 
+hook.Add("Think", "BD.PlyMoveSpeed", function()
+	local base_move_speed = 170
+
+	for _,ply in pairs(player.GetAll()) do
+		local speed_mod = {Speed = base_move_speed}
+		setmetatable(speed_mod, speed_modifier_meta)
+
+		hook.Call("BDSetPlayerSpeed", GAMEMODE, ply, speed_mod)
+
+		ply:SetWalkSpeed(speed_mod.Speed)
+		ply:SetRunSpeed(speed_mod.Speed)
+	end
+end)
+
+--[[
+SCALE MOVESPEED BASED ON STAMINA
+]]
+hook.Add("BDSetPlayerSpeed", "BD.SprintModifier", function(ply, speed)
+	if ply:KeyDown(IN_SPEED) then
+		local mul = 0.95 + math.pow(ply:GetNWFloat("stamina"), 0.3)
+		speed:Scale(mul)
+	end
+end)
+
+--[[
+STAMINA AND HEALTH REGEN
+
+Health regen increases exponentially over time, where time is time since we last got hit
+
+Stamina regen also increases linearly
+]]
 hook.Add("PlayerHurt", "BD_PlayerRegenReset", function(ply)
 	ply.LastDamageTaken = CurTime()
 end)
@@ -58,6 +89,5 @@ hook.Add("Think", "BD_PlayerRegen", function()
 			staminadelta = -(0.2 * FrameTime())
 		end
 		ply:SetNWFloat("stamina", math.Clamp((ply:GetNWFloat("stamina") or 0) + staminadelta, 0, 1))
-		ply:SetSprintEnabled(ply:GetNWFloat("stamina") >= 0.1)
 	end
 end)

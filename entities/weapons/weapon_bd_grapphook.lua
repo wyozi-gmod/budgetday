@@ -22,10 +22,10 @@ SWEP.ViewModelFOV		= 80
 SWEP.ViewModel			= "models/weapons/v_snip_sg550.mdl"
 SWEP.WorldModel			= "models/weapons/w_snip_sg550.mdl"
 
-SWEP.Primary.Sound = Sound( "weapons/usp/usp1.wav" )
+SWEP.Primary.Sound = Sound("weapons/usp/usp1.wav")
 SWEP.Primary.SoundLevel = 50
 
-SWEP.IronSightsPos = Vector( -5.91, -4, 2.84 )
+SWEP.IronSightsPos = Vector(-5.91, -4, 2.84)
 SWEP.IronSightsAng = Vector(-0.5, 0, 0)
 
 SWEP.PrimaryAnim = ACT_VM_PRIMARYATTACK_SILENCED
