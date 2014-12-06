@@ -44,7 +44,7 @@ hook.Add("Think", "BD.LowerGuardSuspicionOverTime", function()
 			end
 		end
 
-		if guard:GetSuspicionLevel() > 0 and (not guard.NextLowerSusp or guard.NextLowerSusp <= CurTime()) then
+		if guard:GetSuspicionLevel() > 0 and guard:GetSuspicionLevel() < 1 and (not guard.NextLowerSusp or guard.NextLowerSusp <= CurTime()) then
 			local old = guard:GetSuspicionLevel()
 
 			guard:SetSuspicionLevel(math.max(0, guard:GetSuspicionLevel() - decr_suspicion_by))

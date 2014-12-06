@@ -141,6 +141,8 @@ function ENT:ComputeDistractionClusters()
 	if not self.DistractionHistory then return {} end
 
 	local hist = self.DistractionHistory
+
+	-- Get distractions that happened <10s ago and group them based on cause
 	hist = bd.util.FilterSeq(hist, function(v) return (CurTime() - v.happened) < 10 end)
 	hist = bd.util.Group(hist, function(v) return v.data.cause end)
 

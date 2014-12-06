@@ -55,7 +55,7 @@ SCALE MOVESPEED BASED ON STAMINA
 ]]
 hook.Add("BDSetPlayerSpeed", "BD.SprintModifier", function(ply, speed)
 	if ply:KeyDown(IN_SPEED) then
-		local mul = 0.95 + math.pow(ply:GetNWFloat("stamina"), 0.3)
+		local mul = 0.95 + 0.75*math.pow(ply:GetNWFloat("stamina"), 0.3)
 		speed:Scale(mul)
 	end
 end)
