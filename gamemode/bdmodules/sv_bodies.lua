@@ -23,7 +23,7 @@ hook.Add("Think", "BDHandleBodyDrag", function()
 				local tvec = vec * len * 20
 				local avec = tvec - phys:GetVelocity()
 				avec = avec:GetNormal() * math.min(45, avec:Length())
-				avec = avec / phys:GetMass() * 16
+				avec = avec / phys:GetMass() * 24
 				phys:AddVelocity(avec)
 			end
 		end
