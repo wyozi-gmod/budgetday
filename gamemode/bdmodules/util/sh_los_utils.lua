@@ -36,14 +36,7 @@ tr_input.filter = function(ent)
 	return not (ent == tr_input.obj1 or ent == tr_input.obj2)
 end
 
-local function bor(...)
-	local v = 0
-	for _,v2 in pairs{...} do
-		v = bit.bor(v, v2)
-	end
-	return v
-end
-local mask = bor(CONTENTS_SOLID, CONTENTS_MOVEABLE, CONTENTS_OPAQUE, CONTENTS_BLOCKLOS, CONTENTS_MONSTER)
+local mask = bit.bor(CONTENTS_SOLID, CONTENTS_MOVEABLE, CONTENTS_OPAQUE, CONTENTS_BLOCKLOS, CONTENTS_MONSTER)
 
 function MODULE.ComputeLos(obj1, obj2, debug)
 	local pos1 = MODULE.GetEntPosition(obj1)

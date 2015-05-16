@@ -31,7 +31,7 @@ hook.Add("Think", "BDHandleBodyDrag", function()
 end)
 
 -- If these keys are down the body is dropped
-local drop_keys = bit.bor(IN_ATTACK, bit.bor(IN_ATTACK2, IN_USE))
+local drop_keys = bit.bor(IN_ATTACK, IN_ATTACK2, IN_USE)
 hook.Add("FinishMove", "BD.DropBody", function(ply, mv)
 	local btns = mv:GetButtons()
 	if (bit.band(btns, drop_keys) ~= 0) and ply.BD_DragData and IsValid(ply.BD_DragData.body) then
