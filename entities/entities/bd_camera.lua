@@ -17,7 +17,7 @@ function ENT:SetupDataTables()
 	self:NetworkVar("String", 0, "CameraName", {KeyName = "cameraname"})
 end
 
-function ENT:KeyValue( key, value )
+function ENT:KeyValue(key, value)
 	if (self:SetNetworkKeyValue(key, value)) then
 		return
 	end

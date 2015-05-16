@@ -30,9 +30,11 @@ hook.Add("Think", "BDHandleBodyDrag", function()
 	end
 end)
 
+-- If these keys are down the body is dropped
+local drop_keys = bit.bor(IN_ATTACK, bit.bor(IN_ATTACK2, IN_USE))
 hook.Add("FinishMove", "BD.DropBody", function(ply, mv)
 	local btns = mv:GetButtons()
-	if (bit.band(btns, IN_ATTACK) == IN_ATTACK or bit.band(btns, IN_ATTACK2) == IN_ATTACK2) and ply.BD_DragData and IsValid(ply.BD_DragData.body) then
+	if (bit.band(btns, drop_keys) ~= 0) and ply.BD_DragData and IsValid(ply.BD_DragData.body) then
 		ply.BD_DragData.body:SetNWBool("BeingDragged", false)
 		ply.BD_DragData = nil
 	end
