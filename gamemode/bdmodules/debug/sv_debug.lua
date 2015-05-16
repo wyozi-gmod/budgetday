@@ -44,11 +44,14 @@ hook.Add("BDNextbotDistraction", "BD.DebugSoundFalloff", function(nextbot, data)
 	-- To give developer a nice view of how falloff works, we start from x = 1/2
 	-- and multiply that by 1/2 for y amount of times, and draw the lines
 
+	bd.debugdraw.SoundWave(data.pos, falloff, falloff_exp, 2)
+
 	local old_point = bd.util.GetEntPosition(nextbot)
 	local norm_diff = (data.pos - old_point):GetNormalized()
 	for p=1, 4 do
 		local suspmul = math.pow(0.5, p)
 		local dist = falloff * math.pow(1/suspmul, 1/falloff_exp)
+
 
 		debugoverlay.Sphere(data.pos, dist, 1, Color(255, 255, 255, 64*suspmul), true)
 	end

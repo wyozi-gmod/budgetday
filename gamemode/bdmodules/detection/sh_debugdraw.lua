@@ -7,7 +7,7 @@ local function netWriteColor(x)
 	if type(x) == "table" then
 		x = Color(x.r, x.g, x.b)
 	end
-	
+
 	net.WriteColor(x)
 end
 
@@ -74,4 +74,27 @@ RegisterFunc("Line", {TYPE_VECTOR, TYPE_VECTOR, TYPE_NUMBER, TYPE_COLOR}, functi
 end)
 RegisterFunc("Text", {TYPE_VECTOR, TYPE_STRING, TYPE_NUMBER}, function(point, text, duration)
 	debugoverlay.Text(point, text, duration or 2)
+end)
+
+local sw_id = 0
+RegisterFunc("SoundWave", {TYPE_VECTOR, TYPE_NUMBER, TYPE_NUMBER, TYPE_NUMBER}, function(point, falloff, falloff_exp, duration)
+	local hookId = "BD.DebugDraw.SoundWave#" .. sw_id
+	sw_id = sw_id+1
+
+	local start = CurTime()
+
+	hook.Add("PostDrawTranslucentRenderables", hookId, function()
+		local elapsed = CurTime() - start
+		local frac = elapsed / (duration or 2)
+		if frac >= 1 then hook.Remove("PostDrawTranslucentRenderables", hookId) return end
+
+		for p=1, 4 do
+			local suspmul = math.pow(0.5, p)
+			local dist = falloff * math.pow(1/suspmul, 1/falloff_exp)
+
+
+			--debugoverlay.Sphere(data.pos, dist, 1, Color(255, 255, 255, 64*suspmul), true)
+			render.DrawSphere(point, dist, 16, 16, Color(255, 255, 255, 64*suspmul))
+		end
+	end)
 end)
