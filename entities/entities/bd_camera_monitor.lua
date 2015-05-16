@@ -34,6 +34,7 @@ end
 function ENT:Initialize()
 	if SERVER then
 		self:SetModel(self.Model)
+		self:PrecacheGibs()
 
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
@@ -66,7 +67,8 @@ end
 
 function ENT:OnTakeDamage(dmginfo)
 	self:GetPhysicsObject():AddVelocity(dmginfo:GetDamageForce() * 0.05)
-	self:GibBreakServer(dmginfo:GetDamageForce())
+	self:GibBreakClient(dmginfo:GetDamageForce())
+	self:Remove()
 end
 
 bd.interactions.Register("cameramonitor_bug", {
