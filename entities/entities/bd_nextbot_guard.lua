@@ -183,6 +183,7 @@ function ENT:ComputeDistractionClusters()
 	return flattened
 end
 
+local cvar_preventalarm = SERVER and CreateConVar("bd_debug_preventalarm", "0", FCVAR_CHEAT + FCVAR_NOTIFY)
 function ENT:BehaviourTick()
 	local poi
 	if self.DistractionHistory then
@@ -203,7 +204,7 @@ function ENT:BehaviourTick()
 		end
 	end
 
-	if self:GetSuspicionLevel() >= 1 then
+	if self:GetSuspicionLevel() >= 1 and not cvar_preventalarm:GetBool() then
 		return self:AlarmedMode(poi)
 	end
 
