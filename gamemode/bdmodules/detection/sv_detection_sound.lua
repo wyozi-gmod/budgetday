@@ -28,6 +28,7 @@ MODULE.SoundDetection = {
         suspicion = 0.5,
         falloff = 64,
         falloff_exp = 1.75,
+        throttle = 0.35, -- single body can trigger suspicion raise only once per 0.5sec
         cause = "heard_body",
         pos = function(data) return data.Entity:GetPos() end
     }
@@ -50,6 +51,7 @@ hook.Add("EntityEmitSound", "BDDetectSounds", function(data)
 
         local falloff = 64 -- How quickly suspicion falls off over distance.
         local falloff_exp = 1
+        local throttle = 0
 
         -- weapon
         if data.Channel == 1 and data.OriginalSoundName ~= "BaseCombatCharacter.StopWeaponSounds" then
@@ -83,10 +85,17 @@ hook.Add("EntityEmitSound", "BDDetectSounds", function(data)
                 if sound_data.pos then pos = sound_data.pos(data) end
                 if sound_data.falloff then falloff = sound_data.falloff end
                 if sound_data.falloff_exp then falloff_exp = sound_data.falloff_exp end
+                if sound_data.throttle then throttle = sound_data.throttle end
             end
         end
 
-        if suspicion > 0 and pos and cause then
+        -- The last time this ent notified of distraction for this cause
+        local lastDistractionRegistered = ent.SoundDetections and ent.SoundDetections[cause]
+
+        if suspicion > 0 and pos and cause and (not lastDistractionRegistered or lastDistractionRegistered < (CurTime()-throttle)) then
+            ent.SoundDetections = ent.SoundDetections or {}
+            ent.SoundDetections[cause] = CurTime()
+
             for _,npc in pairs(ents.FindByClass("bd_nextbot*")) do
                 local dist = npc:GetPos():Distance(pos)
 
