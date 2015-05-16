@@ -41,7 +41,7 @@ function ENT:StartMovingTo(move_data)
 		terminate_condition = function()
 			self:UpdateSightSuspicion()
 
-			if self:GetSuspicionLevel() >= 1 then
+			if self:ShouldBeAlarmed() then
 				return true
 			end
 			return false
@@ -50,6 +50,10 @@ function ENT:StartMovingTo(move_data)
 	})
 end
 
+local cvar_preventalarm = SERVER and CreateConVar("bd_debug_preventalarm", "0", FCVAR_CHEAT + FCVAR_NOTIFY)
+function ENT:ShouldBeAlarmed()
+	return self:GetSuspicionLevel() >= 1 and not cvar_preventalarm:GetBool()
+end
 
 function ENT:AlarmedMode(poi)
 
@@ -183,7 +187,6 @@ function ENT:ComputeDistractionClusters()
 	return flattened
 end
 
-local cvar_preventalarm = SERVER and CreateConVar("bd_debug_preventalarm", "0", FCVAR_CHEAT + FCVAR_NOTIFY)
 function ENT:BehaviourTick()
 	local poi
 	if self.DistractionHistory then
@@ -204,7 +207,7 @@ function ENT:BehaviourTick()
 		end
 	end
 
-	if self:GetSuspicionLevel() >= 1 and not cvar_preventalarm:GetBool() then
+	if self:ShouldBeAlarmed() then
 		return self:AlarmedMode(poi)
 	end
 
