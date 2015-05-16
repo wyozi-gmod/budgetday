@@ -1,4 +1,8 @@
-local soundfile_detection = {
+local MODULE = bd.module("detection")
+
+-- Contains sounds that contribute to detection status
+-- Note: these are the only sounds that affect detection status
+MODULE.SoundDetection = {
     {
         match = function(soundname)
             return soundname:find("footstep") or soundname:find("glass_sheet_step")
@@ -29,7 +33,10 @@ local soundfile_detection = {
     }
 }
 
-local weapon_soundfile_detection = {
+-- Contains weapon sounds that contribute to detection status
+-- Note: all weapon sounds affect detection; this table allows additional metadata
+--       about eg. silencer status of specific gunshot
+MODULE.WeaponSoundDetection = {
     ["weapons/usp/usp1.wav"] = {silenced = true}
 }
 
@@ -46,7 +53,7 @@ hook.Add("EntityEmitSound", "BDDetectSounds", function(data)
 
         -- weapon
         if data.Channel == 1 and data.OriginalSoundName ~= "BaseCombatCharacter.StopWeaponSounds" then
-            local wep_detection = weapon_soundfile_detection[data.SoundName]
+            local wep_detection = MODULE.WeaponSoundDetection[data.SoundName]
 
             local is_silenced = wep_detection and wep_detection.silenced or false
 
@@ -63,7 +70,7 @@ hook.Add("EntityEmitSound", "BDDetectSounds", function(data)
             -- Nonsilenced weapons are audible from really far away
             if not is_silenced then falloff = 600 end
         else
-            local sound_data = bd.util.Find(soundfile_detection, function(tbl)
+            local sound_data = bd.util.Find(MODULE.SoundDetection, function(tbl)
                 return tbl.match(data.SoundName)
             end)
 
