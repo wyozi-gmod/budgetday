@@ -8,7 +8,7 @@ function GM:PlayerSpawn(ply)
 	ply:StripWeapons()
 
 	local wep = ply:Give(bd.weaponcfg.PlyWeapon)
-	ply:GiveAmmo(100, bd.weaponcfg.PlyWeapon)
+	ply:GiveAmmo(100, bd.weaponcfg.PlyWeaponAmmo)
 	wep:SetClip1(wep.Primary.ClipSize)
 
 	ply:GiveSkill("aisah_vitalstats")
