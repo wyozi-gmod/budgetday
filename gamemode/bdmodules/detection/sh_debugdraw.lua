@@ -25,7 +25,7 @@ local function RegisterFunc(name, types, fn)
 		util.AddNetworkString(name)
 
 		MODULE[name] = function(...)
-			net.Start("bd_debugdraw")
+			net.Start("bd_debugdraw", true)
 			net.WriteUInt(util.NetworkStringToID(name), 32)
 
 			local at = {...}
@@ -97,4 +97,32 @@ RegisterFunc("SoundWave", {TYPE_VECTOR, TYPE_NUMBER, TYPE_NUMBER, TYPE_NUMBER}, 
 			render.DrawSphere(point, dist, 16, 16, Color(255, 255, 255, 64*suspmul))
 		end
 	end)
+end)
+
+RegisterFunc("Sight", {TYPE_VECTOR, TYPE_VECTOR, TYPE_NUMBER, TYPE_NUMBER}, function(point, dir, height, angle)
+	local cone_apex = point
+	local cone_dir = dir
+
+	local cone_height = height
+	local cone_angle = angle
+
+	bd.debugdraw.Line(cone_apex, cone_apex + cone_dir*cone_height, 0.15, Color(0, 255, 0))
+
+	-- Let's compute right and up vectors from the forward vector using cross products
+	local right_vec = cone_dir:Cross(Vector(0, 0, 1))
+	local up_vec = -cone_dir:Cross(right_vec)
+
+	local radius = math.tan(math.rad(cone_angle)) * cone_height
+
+	local points = 32
+	local rad_per_point = math.pi*2 / points
+	for i=0,points do
+		local point1 = cone_apex
+		local point2 = cone_apex + cone_dir * cone_height
+							+ right_vec * math.cos(rad_per_point * i) * radius
+							+ up_vec * math.sin(rad_per_point * i) * radius
+
+		bd.debugdraw.Line(point1, point2, 0.15, Color(255, 127, 0))
+	end
+	--bd.debugdraw.Text(point, text, duration or 2)
 end)

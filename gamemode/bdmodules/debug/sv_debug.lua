@@ -3,6 +3,8 @@ local debug_falloff = CreateConVar("bd_debug_sound_falloff", "0")
 local debug_falloff_filter = CreateConVar("bd_debug_sound_falloff_filter", "")
 local debug_distclusters = CreateConVar("bd_debug_distclusters", "0")
 local debug_losents = CreateConVar("bd_debug_losents", "0")
+local debug_sight = CreateConVar("bd_debug_sight", "0")
+
 local debug_devmode = CreateConVar("bd_debug_devmode", "0", FCVAR_ARCHIVE)
 
 hook.Add("PlayerNoClip", "BD.Noclip", function(ply)
@@ -96,6 +98,49 @@ hook.Add("Think", "BD.DebugLOSEntities", function()
 			else
 				bd.debugdraw.Line(bd.util.GetEntPosition(ent), bd.util.GetEntPosition(sent.ent), 0.2, Color(127, 255, 0))
 			end
+		end
+	end
+end)
+
+
+hook.Add("Think", "BD.DebugSight", function()
+	if not debug_sight:GetBool() then return end
+
+	for _,ent in pairs(ents.GetAll()) do
+		if ent.Sight then
+			local cone_apex = (ent.Sight.ent_pos) and ent.Sight.ent_pos(ent) or bd.util.GetEntPosition(ent)
+			local cone_dir = (ent.Sight.ent_dir) and ent.Sight.ent_dir(ent) or ent:GetAngles():Forward()
+
+			local cone_height = ent.Sight.distance
+			local cone_angle = ent.Sight.angle
+
+			bd.debugdraw.Sight(cone_apex, cone_dir, cone_height, cone_angle)
+			--[[
+			local cone_apex = (ent.Sight.ent_pos) and ent.Sight.ent_pos(ent) or bd.util.GetEntPosition(ent)
+			local cone_dir = (ent.Sight.ent_dir) and ent.Sight.ent_dir(ent) or ent:GetAngles():Forward()
+
+			local cone_height = ent.Sight.distance
+			local cone_angle = ent.Sight.angle
+
+			bd.debugdraw.Line(cone_apex, cone_apex + cone_dir*cone_height, 0.5, Color(0, 255, 0))
+
+			-- Let's compute right and up vectors from the forward vector using cross products
+			local right_vec = cone_dir:Cross(Vector(0, 0, 1))
+			local up_vec = -cone_dir:Cross(right_vec)
+
+			local radius = math.tan(math.rad(cone_angle)) * cone_height
+
+			local points = 32
+			local rad_per_point = math.pi*2 / points
+			for i=0,points do
+				local point1 = cone_apex
+				local point2 = cone_apex + cone_dir * cone_height
+									+ right_vec * math.cos(rad_per_point * i) * radius
+									+ up_vec * math.sin(rad_per_point * i) * radius
+
+				bd.debugdraw.Line(point1, point2, 0.5, Color(255, 127, 0))
+			end
+			]]
 		end
 	end
 end)

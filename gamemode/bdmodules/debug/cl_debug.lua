@@ -1,5 +1,4 @@
 local debug_hitboxes = CreateConVar("bd_debug_hitboxes", "0", FCVAR_CHEAT)
-local debug_sight = CreateConVar("bd_debug_sight", "0", FCVAR_CHEAT)
 local debug_cams = CreateConVar("bd_debug_cams", "0", FCVAR_CHEAT)
 
 hook.Add("Think", "BD.DebugNextBotHitboxes", function()
@@ -22,39 +21,6 @@ hook.Add("Think", "BD.DebugNextBotHitboxes", function()
 				bd.debugdraw.Text(bonepos, string.format("%d: %s", hitbox, nb:GetBoneName(bone)), 0.1)
 
 				print( "Hit box group " .. group .. ", hitbox " .. hitbox .. " is attached to bone " .. nb:GetBoneName( bone ) )
-			end
-		end
-	end
-end)
-
-hook.Add("Think", "BD.DebugSight", function()
-	if not debug_sight:GetBool() then return end
-
-	for _,ent in pairs(ents.GetAll()) do
-		if ent.Sight then
-			local cone_apex = (ent.Sight.ent_pos) and ent.Sight.ent_pos(ent) or bd.util.GetEntPosition(ent)
-			local cone_dir = (ent.Sight.ent_dir) and ent.Sight.ent_dir(ent) or ent:GetAngles():Forward()
-
-			local cone_height = ent.Sight.distance
-			local cone_angle = ent.Sight.angle
-
-			bd.debugdraw.Line(cone_apex, cone_apex + cone_dir*cone_height, 0.2, Color(0, 255, 0))
-
-			-- Let's compute right and up vectors from the forward vector using cross products
-			local right_vec = cone_dir:Cross(Vector(0, 0, 1))
-			local up_vec = -cone_dir:Cross(right_vec)
-
-			local radius = math.tan(math.rad(cone_angle)) * cone_height
-
-			local points = 32
-			local rad_per_point = math.pi*2 / points
-			for i=0,points do
-				local point1 = cone_apex
-				local point2 = cone_apex + cone_dir * cone_height
-									+ right_vec * math.cos(rad_per_point * i) * radius
-									+ up_vec * math.sin(rad_per_point * i) * radius
-
-				bd.debugdraw.Line(point1, point2, 0.1, Color(255, 127, 0))
 			end
 		end
 	end
