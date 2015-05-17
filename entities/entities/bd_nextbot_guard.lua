@@ -116,21 +116,21 @@ function ENT:AlarmedMode(poi)
 	end
 
 	if IsValid(shoot_targ) and bd.util.ComputeLos(self, shoot_targ) then
-		self.loco:FaceTowards(shoot_targ:GetBonePosition(shoot_targ:LookupBone("ValveBiped.Bip01_Spine")))
+		local shootposang = self:GetAttachment(self:LookupAttachment("anim_attachment_RH"))
+		local shootpos = shootposang.Pos
+		local tpos = shoot_targ:GetBonePosition(shoot_targ:LookupBone("ValveBiped.Bip01_Spine"))
+		self:AimAt(tpos)
 
 		if not self.NextShoot or self.NextShoot <= CurTime() then
-
 			local bullet = {}
 
-			local shootpos = self:GetAttachment(self:LookupAttachment("anim_attachment_LH"))
-
-			local ang = self:GetAngles()
-			local pos = shootpos.Pos + ang:Up() * 5
+			local ang = (tpos - shootpos):Angle()
+			local pos = shootpos + ang:Up() * 5
 
 			bullet.Num 	= 1
 			bullet.Dir 	= ang:Forward()
 			bullet.Src 	= pos
-			bullet.Spread 	= Vector( 0.1, 0.1, 0 )	 -- Aim Cone
+			bullet.Spread 	= Vector( 0.07, 0.07, 0 )	 -- Aim Cone
 			bullet.Tracer	= 1 -- Show a tracer on every x bullets
 			bullet.Force	= 1 -- Amount of force to give to phys objects
 			bullet.Damage	= 25
@@ -151,10 +151,63 @@ function ENT:AlarmedMode(poi)
 			self.NextShoot = CurTime() + math.random(0.3, 0.6)
 		end
 	elseif poi and poi.spotted_directly and poi.pos then
-		self.loco:FaceTowards(poi.pos)
+		local seesSomethingInteresting = true
+
+		-- Only check if we're looking at something interesting if we're already looking at POI pos
+		if self:EyeDirN():DotProduct((poi.pos - self:EyePosN()):GetNormalized()) > 0.8 then
+			local losEnts = self:ComputeLOSEntities {
+				filter = function(ent)
+					return ent:IsPlayer() or
+							ent:GetClass() == "prop_ragdoll"
+				end
+			}
+
+			seesSomethingInteresting = #losEnts > 0
+
+			-- Note:
+			-- We're in alarmed mode, so if we see a ragdoll we should acknowledge it, but it is definitely
+			-- not more important than eg. ongoing gunfight. That's why we prioritize everything else with
+			-- IgnoreDistractionsAt function over this specific ragdoll
+			for _,edata in pairs(losEnts) do
+				if edata.ent:GetClass() == "prop_ragdoll" then
+					self:IgnoreDistractionsAt(edata.ent:GetPos(), "spotted_ragdoll", 3)
+				end
+			end
+		end
+
+		if not seesSomethingInteresting then
+			self:IgnoreDistractionsAt(poi.pos, poi.cause, 3)
+			return 0
+		end
+
+		local tpos = poi.pos
+		self:LookAt(tpos)
 	end
 
 	return 0
+end
+
+-- Call this to ignore distractions at some point for x time
+function ENT:IgnoreDistractionsAt(pos, cause, time, radius)
+	radius = radius or 256
+
+	self.IgnoringDistractions = self.IgnoringDistractions or {}
+	table.insert(self.IgnoringDistractions, {pos = pos, cause = cause, ends = CurTime() + time, time = time, radius = radius})
+end
+
+function ENT:ShouldIgnoreDistraction(pos, cause)
+	if not self.IgnoringDistractions then return false end
+
+	for _,id in pairs(self.IgnoringDistractions) do
+		local isWithinTime = id.time == 0 or id.ends > CurTime()
+		local isWithin = id.pos:Distance(pos) < id.radius
+		local isCause = not cause or id.cause == cause
+		if isWithinTime and isWithin and isCause then
+			return true
+		end
+	end
+
+	return false
 end
 
 function ENT:ComputeDistractionClusters()
@@ -209,7 +262,7 @@ function ENT:BehaviourTick()
 		local clusters = self:ComputeDistractionClusters()
 
 		for groupname,group in pairs(clusters) do
-			if group.level > 0 and (not poi or group.level > poi.level) then
+			if group.level > 0 and (not poi or group.level > poi.level) and (not self:ShouldIgnoreDistraction(group.pos, group.cause)) then
 				poi = {pos = group.pos, level = group.level, spotter = group.spotter, cause = group.cause}
 
 				-- Is the POI caused by something we saw with our own ears or heard nearby

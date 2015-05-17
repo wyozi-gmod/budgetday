@@ -1,7 +1,7 @@
 AddCSLuaFile()
 
-ENT.Base 			= "base_nextbot"
-ENT.Spawnable		= true
+ENT.Base            = "base_nextbot"
+ENT.Spawnable       = true
 
 -- NextBot related variables
 ENT.Model = Model("models/Kleiner.mdl")
@@ -212,6 +212,38 @@ function ENT:EyePosN()
 	return headpos
 end
 
+function ENT:EyeDirN()
+	return self:GetAngles():Forward()
+end
+
+function ENT:LookAt(pos)
+	local angdiff = (pos - self:EyePosN()):Angle()
+
+	local yaw = math.NormalizeAngle(angdiff.y - self:GetAngles().y)
+
+	self.loco:FaceTowards(pos)
+
+	yaw = math.NormalizeAngle(angdiff.y - self:GetAngles().y)
+	self:SetPoseParameter("head_yaw", yaw)
+
+	local pitch = math.Clamp(-math.NormalizeAngle(angdiff.p), -20, 20)
+	self:SetPoseParameter("head_pitch", pitch)
+
+	self:SetEyeTarget(pos)
+end
+
+function ENT:AimAt(pos)
+	local angdiff = (pos - self:EyePosN()):Angle()
+
+	self:LookAt(pos)
+
+	local yaw = math.NormalizeAngle(angdiff.y - self:GetAngles().y)
+	self:SetPoseParameter("aim_yaw", -yaw)
+
+	local pitch = math.Clamp(-math.NormalizeAngle(angdiff.p), -50, 50)
+	self:SetPoseParameter("aim_pitch", -pitch)
+end
+
 function ENT:AddFlashlight()
 	local shootpos = self:GetAttachment(self:LookupAttachment("anim_attachment_LH"))
 
@@ -224,18 +256,18 @@ function ENT:AddFlashlight()
 	wep:SetDistance(512)
 	wep:SetBrightness(1)
 	wep:SetLightFOV(80)
-    wep:Switch(true)
+	wep:Switch(true)
 
-    wep:Spawn()
+	wep:Spawn()
 
-    wep:SetModelScale(0.5, 0)
+	wep:SetModelScale(0.5, 0)
 
-    wep:SetSolid(SOLID_NONE)
-    wep:SetParent(self)
+	wep:SetSolid(SOLID_NONE)
+	wep:SetParent(self)
 
-    wep:Fire("setparentattachment", "anim_attachment_LH")
+	wep:Fire("setparentattachment", "anim_attachment_LH")
 
-    self.Flashlight = wep
+	self.Flashlight = wep
 
 	table.insert(self.OnArm, function() if IsValid(self.Flashlight) then self.Flashlight:Remove() end end)
 end
