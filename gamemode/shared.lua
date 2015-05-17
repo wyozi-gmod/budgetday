@@ -1,5 +1,3 @@
-DeriveGamemode("sandbox")
-
 -- Helper functions to load files
 loader = {}
 

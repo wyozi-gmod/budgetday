@@ -3,6 +3,11 @@ local debug_falloff = CreateConVar("bd_debug_sound_falloff", "0")
 local debug_falloff_filter = CreateConVar("bd_debug_sound_falloff_filter", "")
 local debug_distclusters = CreateConVar("bd_debug_distclusters", "0")
 local debug_losents = CreateConVar("bd_debug_losents", "0")
+local debug_devmode = CreateConVar("bd_debug_devmode", "0", FCVAR_ARCHIVE)
+
+hook.Add("PlayerNoClip", "BD.Noclip", function(ply)
+	if debug_devmode:GetBool() then return true end
+end)
 
 hook.Add("BDNextbotDistraction", "BD.DebugDistractions", function(nextbot, data)
 	if not debug_dist:GetBool() then return end

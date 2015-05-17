@@ -3,7 +3,8 @@
 -- without editing the base code
 
 AddCSLuaFile()
-DEFINE_BASECLASS( "base_gmodentity" )
+
+ENT.Type = "anim"
 
 ENT.Spawnable			= false
 ENT.RenderGroup 		= RENDERGROUP_BOTH
@@ -151,9 +152,6 @@ end
    Name: Draw
 -----------------------------------------------------------]]
 function ENT:Draw()
-
-	BaseClass.Draw( self )
-	
 end
 
 --[[---------------------------------------------------------
@@ -161,8 +159,6 @@ end
    Desc: Draw translucent
 -----------------------------------------------------------]]
 function ENT:DrawTranslucent()
-	
-	BaseClass.DrawTranslucent( self )
 	
 	-- No glow if we're not switched on!
 	if ( !self:GetOn() ) then return end
