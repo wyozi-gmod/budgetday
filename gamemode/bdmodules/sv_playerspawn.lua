@@ -6,7 +6,10 @@ function GM:PlayerSpawn(ply)
 	ply:SetModel("models/player/alyx.mdl")
 
 	ply:StripWeapons()
-	ply:Give("weapon_bd_usp")
+
+	local wep = ply:Give(bd.weaponcfg.PlyWeapon)
+	ply:GiveAmmo(100, bd.weaponcfg.PlyWeapon)
+	wep:SetClip1(wep.Primary.ClipSize)
 
 	ply:GiveSkill("aisah_vitalstats")
 	ply:GiveSkill("aisah_nightvision")

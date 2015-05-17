@@ -93,7 +93,7 @@ function ENT:AlarmedMode(poi)
 	end
 
 	if not self.IsArmed or force_rearm then
-		self:GiveWeapon("weapon_bd_usp")
+		self:GiveWeapon(bd.weaponcfg.GuardWeapon)
 		self:PlaySequenceAndWait("drawpistol")
 
 		self.IsArmed = true

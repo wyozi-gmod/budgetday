@@ -40,6 +40,11 @@ loader.shared("modules.lua")
 loader.client("libext/surface.lua")
 loader.shared("libext/misc.lua")
 
+-- Load cfg files
+for _,fil in pairs(loader.luafiles("bdcfg", "*.lua")) do
+	loader.server("bdcfg/" .. fil)
+end
+
 -- Traverses through all folders and files in given folder and loads lua files from them
 local function LoadFromFolder(folder)
 	local _, folders = loader.luafiles(folder)
