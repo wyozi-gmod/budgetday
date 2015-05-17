@@ -148,7 +148,14 @@ function ENT:AlarmedMode(poi)
 
 			util.Effect( "MuzzleEffect", effectdata )
 
-			self.NextShoot = CurTime() + math.random(0.3, 0.6)
+			self.NextShoot = CurTime() + math.random(0.3, 0.4)
+			self.Shots = (self.Shots or 0) + 1
+
+			if self.Shots % 12 == 0 then
+				self:PlaySequenceAndWait("Shoot_to_crouchpistol")
+				self:PlaySequenceAndWait("crouch_reload_pistol")
+				self:PlaySequenceAndWait("crouch_to_shootpistol")
+			end
 		end
 	elseif poi and poi.spotted_directly and poi.pos then
 		local seesSomethingInteresting = true
@@ -196,6 +203,7 @@ function ENT:IgnoreDistractionsAt(pos, cause, time, radius)
 end
 
 function ENT:ShouldIgnoreDistraction(pos, cause)
+	if not pos then return false end
 	if not self.IgnoringDistractions then return false end
 
 	for _,id in pairs(self.IgnoringDistractions) do
