@@ -19,8 +19,16 @@ function MODULE.Start()
         nb:NotifyDistraction({level = 1, cause = "policeraid_start"})
     end
 
+    timer.Create("BDRaidTimer", 1, 1, function()
+        timer.Create("BDRaidTimer", 3, 0, function()
+            local e = ents.Create("bd_nextbot_swat")
+            e:SetPos(Vector(-24.689302, -923.557068, 129.031250))
+            e:Spawn()
+        end)
+    end)
 end
 
 hook.Add("BDRoundStateChanged", "BD.ResetPoliceRaid", function(oldstate, newstate)
     MODULE.PoliceInformed = false
+    timer.Destroy("BDRaidTimer")
 end)
