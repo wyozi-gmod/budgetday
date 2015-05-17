@@ -381,6 +381,19 @@ function ENT:RunBehaviour()
 	end
 end
 
+function ENT:DynamicWait(time, fn, tick)
+	tick = tick or 0.1
+
+	local stime = RealTime()
+	while (RealTime()-time) < stime do
+		if fn(self) then
+			return true
+		end
+
+		coroutine.wait(tick)
+	end
+end
+
 function ENT:Think()
 	if IsValid(self.Flashlight) then
 		local shootpos = self:GetAttachment(self:LookupAttachment("anim_attachment_LH"))

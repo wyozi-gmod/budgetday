@@ -17,6 +17,7 @@
 	[
 		"roaming" : "Roaming"
 		"passive" : "Passive"
+		"monitoring" : "Monitoring (reports suspicious things to other guards)"
 	]
 
 	carryitem(choices) : "Item in left hand" : "" : "The item this guard carries in his left hand" =

@@ -23,6 +23,8 @@ function ENT:UpdateSightSuspicion(callback)
 
 		if callback then callback(data) end
 	end
+
+	return self:ShouldBeAlarmed()
 end
 
 function ENT:StartMovingTo(move_data)
@@ -37,16 +39,30 @@ function ENT:StartMovingTo(move_data)
 	end
 	self.loco:SetDeathDropHeight(40)
 
-	self:MoveToPos(move_data.pos, {
+	local upd_seen
+	local upd_pos
+	return self:MoveToPos(move_data.pos, {
 		terminate_condition = function()
-			self:UpdateSightSuspicion()
-
-			if self:ShouldBeAlarmed() then
+			if upd_seen and upd_seen < CurTime()-2 then upd_pos = nil end
+			
+			if self:UpdateSightSuspicion(function(data)
+				local e = data.ent
+				if IsValid(e) then
+					self.loco:FaceTowards(e:GetPos())
+					upd_pos = e:GetPos()
+					upd_seen = CurTime()
+				end
+			end) then
 				return true
+			end
+
+			if not upd_pos and move_data.susp_pos then
+				self.loco:FaceTowards(move_data.susp_pos)
 			end
 			return false
 		end,
-		repath = 1
+		repath = 1,
+		repath_pos = function() return upd_pos end
 	})
 end
 
@@ -213,14 +229,48 @@ function ENT:BehaviourTick()
 
 	self:UpdateSightSuspicion()
 
-	if self.NPCType == "roaming" and (not self.NextRoam or self.NextRoam < CurTime()) then
+	if self.NPCType == "roaming" and ( (poi and poi.cause == "monitoring_asked") or (not self.NextRoam or self.NextRoam < CurTime()) ) then
+		local pos = table.Random(ents.FindByClass("bd_npc_poi")):GetPos()
+		if poi and poi.cause == "monitoring_asked" then
+			pos = poi.pos
+
+			-- Look at the spot first
+			self.loco:FaceTowards(poi.pos)
+			--MsgN("Going to spot that monitoring asked us to check")
+		end
+
 		self:StartMovingTo {
-			pos = table.Random(ents.FindByClass("bd_npc_poi")):GetPos(),
+			pos = pos,
 			run = false,
-			spot_callback = spot_callback
+			susp_pos = poi and poi.pos
 		}
 
-		self.NextRoam = CurTime() + math.random(2, 15)
+		self.NextRoam = CurTime() + math.Rand(2, 15)
+	end
+
+	if self.NPCType == "monitoring" and poi and not poi.spotted_directly and poi.level >= 0.1 and (not self.NextMonAsk or self.NextMonAsk < CurTime()) then
+		local alarmTriggered = false
+
+		self:SetSequence("stopwoman")
+		if self:DynamicWait(math.random(0.6, 1.3), function()
+			return self:UpdateSightSuspicion()
+		end) then return end
+
+		self:EmitSound("npc/combine_soldier/vo/callcontacttarget1.wav")
+		if self:DynamicWait(1.5 + math.random(1.0, 1.5), function()
+			return self:UpdateSightSuspicion()
+		end) then return end
+
+		local randomGuard = table.Random(ents.FindByClass("bd_nextbot_guard"))
+		if IsValid(randomGuard) then
+			randomGuard:NotifyDistraction({
+				level = 0.3,
+				pos = poi.pos,
+				cause = "monitoring_asked"
+			})
+		end
+
+		self.NextMonAsk = CurTime() + math.Rand(3, 8)
 	end
 
 	if poi and poi.level >= 0.25 and poi.spotted_directly then
@@ -228,4 +278,5 @@ function ENT:BehaviourTick()
 	end
 
 	self:StartActivity(ACT_IDLE)
+	coroutine.wait(0.1)
 end
