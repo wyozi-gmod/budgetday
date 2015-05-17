@@ -21,7 +21,17 @@ hook.Add("BDGuardSpotted", "BDRaiseGuardSuspicion", function(data)
 		cause = "spotted_ragdoll"
 	end
 	if ent:IsPlayer() then
-		base_incr = ent:KeyDown(IN_DUCK) and 0.04 or 0.1
+		-- If player just shot they instantly trigger alarm
+		if ent.BD_LastShot and ent.BD_LastShot > CurTime()-1 then
+			base_incr = 1
+		elseif ent:KeyDown(IN_SPEED) then
+			base_incr = 0.2 -- TODO should check if theyre actually running or just holding the key down
+		elseif ent:KeyDown(IN_DUCK) then
+			base_incr = 0.04
+		else
+			base_incr = 0.1
+		end
+
 		cause = "spotted_player"
 	end
 
@@ -30,6 +40,12 @@ hook.Add("BDGuardSpotted", "BDRaiseGuardSuspicion", function(data)
 		local incr = base_incr * suspicionmul * final_mul
 
 		guard:NotifyDistraction({level = incr, pos = ent:GetPos(), spotter_ent = data.spotter, cause = cause})
+	end
+end)
+
+hook.Add("EntityFireBullets", "BD.DetectShootings", function(ent, data)
+	if ent:IsPlayer() then
+		ent.BD_LastShot = CurTime()
 	end
 end)
 
