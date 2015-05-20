@@ -16,7 +16,7 @@ end
 function ENT:StartMovingTo(pos)
 	self.loco:SetAcceleration(200)
 	self.loco:SetDesiredSpeed(200)
-	self:StartActivity(ACT_RUN)
+	self:StartActivity(ACT_RUN_AIM_RIFLE)
 	self.loco:SetDeathDropHeight(40)
 
 	return self:MoveToPos(pos, {
@@ -27,16 +27,21 @@ function ENT:StartMovingTo(pos)
 	})
 end
 
+-- self:RestartGesture(ACT_SIGNAL_ADVANCE)
+
 function ENT:BehaviourTick()
 	if not self.IsArmed then
-		self:GiveWeapon("weapon_ak47")
+		self:GiveWeapon("weapon_m4a1")
 		self.IsArmed = true
 	end
 
 	local shoot_targ = self:GetEnemyOnSight()
 
 	if IsValid(shoot_targ) then
-		self:StartActivity(ACT_IDLE)
+		-- https://github.com/Chessnut/NutScript/blob/master/gamemode/libs/sh_animation.lua
+		self:PlaySequenceAndWait("shootSMG1s")
+
+		--self:StartActivity(ACT_IDLE)
 
 		local shootposang = self:GetAttachment(self:LookupAttachment("anim_attachment_RH"))
 		local shootpos = shootposang.Pos
@@ -61,7 +66,7 @@ function ENT:BehaviourTick()
 			--debugoverlay.Line(bullet.Src, bullet.Src + bullet.Dir * 100, 2)
 
 			self:FireBullets( bullet )
-			self:EmitSound(Sound( "Weapon_AK47.Single" ))
+			self:EmitSound(Sound( "Weapon_M4A1.Single" ))
 
 			local effectdata = EffectData()
 			effectdata:SetOrigin(bullet.Src)

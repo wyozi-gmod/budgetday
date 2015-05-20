@@ -318,6 +318,7 @@ function ENT:GiveWeapon(weaponcls)
 	local att = "anim_attachment_RH"
 
 	local shootpos = self:GetAttachment(self:LookupAttachment(att))
+	
 	local wep = ents.Create(weaponcls)
 
 	wep:SetOwner(self)
@@ -328,9 +329,10 @@ function ENT:GiveWeapon(weaponcls)
 	wep:SetSolid(SOLID_NONE)
 	wep:SetParent(self)
 
-	wep:Fire("setparentattachment", att)
-	wep:AddEffects(EF_BONEMERGE)
 	wep:SetAngles(self:GetForward():Angle())
+
+	wep:Fire("setparentattachment", att)
+	--wep:AddEffects(EF_BONEMERGE)
 
 	self.Weapon = wep
 
