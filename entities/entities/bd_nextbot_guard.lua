@@ -83,13 +83,16 @@ function ENT:AlarmedMode(poi)
 		if data.ent:IsPlayer() then shoot_targ = data.ent end
 	end)
 
+	local is_hurt = self:Health() < 35
+
 	local force_rearm = false
 
 	-- If we're in alarmed mode and there is nothing to shoot, we will call for help
-	if not self.HasCalledForHelp and not shoot_targ then
+	if not self.HasCalledForHelp and (not shoot_targ or is_hurt) then
 		self:SetNWBool("CallingForHelp", CurTime())
 
-		self:SetSequence("harrassidle")
+		self:PlaySequenceAndWait("Shoot_to_crouchpistol")
+		--self:SetSequence("harrassidle")
 
 		coroutine.wait(math.random(0.6, 1.3))
 
