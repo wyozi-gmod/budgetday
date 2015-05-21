@@ -25,11 +25,11 @@ hook.Add("BDGuardSpotted", "BDRaiseGuardSuspicion", function(data)
 		if ent.BD_LastShot and ent.BD_LastShot > CurTime()-1 then
 			base_incr = 1
 		elseif ent:KeyDown(IN_SPEED) then
-			base_incr = 0.2 -- TODO should check if theyre actually running or just holding the key down
+			base_incr = 0.3 -- TODO should check if theyre actually running or just holding the key down
 		elseif ent:KeyDown(IN_DUCK) then
-			base_incr = 0.04
+			base_incr = 0.08
 		else
-			base_incr = 0.1
+			base_incr = 0.2
 		end
 
 		cause = "spotted_player"
