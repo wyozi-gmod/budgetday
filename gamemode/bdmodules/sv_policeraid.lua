@@ -20,7 +20,7 @@ function MODULE.Start()
     end
 
     timer.Create("BDRaidTimer", 1, 1, function()
-        timer.Create("BDRaidTimer", 3, 0, function()
+        timer.Create("BDRaidTimer", 5, 3, function()
             local e = ents.Create("bd_nextbot_swat")
             e:SetPos(Vector(-24.689302, -923.557068, 129.031250))
             e:Spawn()
