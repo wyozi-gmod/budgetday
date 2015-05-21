@@ -91,7 +91,7 @@ function ENT:AlarmedMode(poi)
 	if not self.HasCalledForHelp and (not shoot_targ or is_hurt) then
 		self:SetNWBool("CallingForHelp", CurTime())
 
-		self:PlaySequenceAndWait("Shoot_to_crouchpistol")
+		self:PlaySequenceAndWait("Shoot_to_crouchpistol", 1.5)
 		--self:SetSequence("harrassidle")
 
 		coroutine.wait(math.random(0.6, 1.3))
@@ -113,7 +113,7 @@ function ENT:AlarmedMode(poi)
 
 	if not self.IsArmed or force_rearm then
 		self:GiveWeapon(bd.weaponcfg.GuardWeapon)
-		self:PlaySequenceAndWait("drawpistol")
+		self:PlaySequenceAndWait("drawpistol", 1.5)
 
 		self.IsArmed = true
 	end
